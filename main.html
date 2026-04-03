@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Mastery Roadmap</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #080b10;
+    --surface: #0d1117;
+    --surface2: #161b22;
+    --border: #21262d;
+    --accent: #00ff88;
+    --accent2: #00b8ff;
+    --accent3: #ff6b35;
+    --accent4: #bf5af2;
+    --text: #e6edf3;
+    --text-muted: #7d8590;
+    --text-dim: #484f58;
+    --done: #238636;
+    --phase0: #00ff88;
+    --phase1: #00b8ff;
+    --phase2: #ff6b35;
+    --phase3: #bf5af2;
+    --phase4: #ffd700;
+    --phase5: #ff4081;
+    --phase6: #00e5ff;
+    --phase7: #69ff47;
+    --phase8: #ff9100;
+    --phase9: #e040fb;
+    --phase10: #ff1744;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Animated grid background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,255,136,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,255,136,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Header */
+  .header {
+    text-align: center;
+    margin-bottom: 48px;
+  }
+
+  .header .tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    display: block;
+  }
+
+  .header h1 {
+    font-size: clamp(32px, 6vw, 56px);
+    font-weight: 800;
+    line-height: 1.1;
+    background: linear-gradient(135deg, #00ff88, #00b8ff, #bf5af2);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 12px;
+  }
+
+  .header p {
+    color: var(--text-muted);
+    font-size: 15px;
+    max-width: 500px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  /* Overall progress */
+  .overall-progress {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px 28px;
+    margin-bottom: 32px;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+  }
+
+  .progress-circle {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    flex-shrink: 0;
+  }
+
+  .progress-circle svg {
+    transform: rotate(-90deg);
+    width: 80px;
+    height: 80px;
+  }
+
+  .progress-circle .track {
+    fill: none;
+    stroke: var(--border);
+    stroke-width: 6;
+  }
+
+  .progress-circle .fill {
+    fill: none;
+    stroke: url(#progressGrad);
+    stroke-width: 6;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 0.6s ease;
+  }
+
+  .progress-circle .pct {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Space Mono', monospace;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  .progress-info h3 {
+    font-size: 18px;
+    font-weight: 800;
+    margin-bottom: 4px;
+  }
+
+  .progress-info p {
+    color: var(--text-muted);
+    font-size: 13px;
+    font-family: 'Space Mono', monospace;
+  }
+
+  .progress-bar-wrap {
+    flex: 1;
+  }
+
+  .progress-bar-bg {
+    height: 8px;
+    background: var(--border);
+    border-radius: 99px;
+    overflow: hidden;
+    margin-top: 8px;
+  }
+
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 99px;
+    transition: width 0.6s ease;
+    width: 0%;
+  }
+
+  /* Phase card */
+  .phase {
+    margin-bottom: 20px;
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+    transition: border-color 0.3s;
+  }
+
+  .phase:hover { border-color: var(--border); }
+  .phase.has-progress { border-color: color-mix(in srgb, var(--phase-color) 30%, transparent); }
+  .phase.complete { border-color: var(--done); }
+
+  .phase-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 18px 20px;
+    cursor: pointer;
+    background: var(--surface2);
+    user-select: none;
+    transition: background 0.2s;
+  }
+
+  .phase-header:hover { background: #1a2030; }
+
+  .phase-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--phase-color, var(--accent));
+    background: color-mix(in srgb, var(--phase-color, var(--accent)) 15%, transparent);
+    border: 1px solid color-mix(in srgb, var(--phase-color, var(--accent)) 40%, transparent);
+    border-radius: 6px;
+    padding: 4px 8px;
+    letter-spacing: 1px;
+    min-width: 56px;
+    text-align: center;
+  }
+
+  .phase-title-wrap { flex: 1; }
+
+  .phase-title {
+    font-size: 16px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .phase-sub {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 3px;
+    font-family: 'Space Mono', monospace;
+  }
+
+  .phase-progress-mini {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  .mini-bar {
+    width: 60px;
+    height: 4px;
+    background: var(--border);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+
+  .mini-bar-fill {
+    height: 100%;
+    background: var(--phase-color, var(--accent));
+    border-radius: 99px;
+    transition: width 0.4s ease;
+    width: 0%;
+  }
+
+  .chevron {
+    color: var(--text-dim);
+    font-size: 18px;
+    transition: transform 0.3s;
+    line-height: 1;
+  }
+
+  .phase.open .chevron { transform: rotate(180deg); }
+
+  /* Topics list */
+  .topics {
+    display: none;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+  }
+
+  .phase.open .topics { display: block; }
+
+  .topic-item {
+    display: grid;
+    grid-template-columns: 36px 1fr auto;
+    align-items: start;
+    gap: 12px;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .topic-item:last-child { border-bottom: none; }
+  .topic-item:hover { background: #0d1520; }
+  .topic-item.checked { background: color-mix(in srgb, var(--done) 6%, transparent); }
+
+  .checkbox {
+    width: 22px;
+    height: 22px;
+    border-radius: 6px;
+    border: 2px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+    transition: all 0.2s;
+    background: transparent;
+  }
+
+  .topic-item.checked .checkbox {
+    background: var(--done);
+    border-color: var(--done);
+  }
+
+  .checkbox-tick {
+    opacity: 0;
+    font-size: 13px;
+    color: white;
+    transition: opacity 0.2s;
+  }
+
+  .topic-item.checked .checkbox-tick { opacity: 1; }
+
+  .topic-content {}
+
+  .topic-name {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 4px;
+    line-height: 1.3;
+  }
+
+  .topic-item.checked .topic-name {
+    color: var(--text-muted);
+    text-decoration: line-through;
+    text-decoration-color: var(--done);
+  }
+
+  .why-matters {
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.5;
+  }
+
+  .topic-item.checked .why-matters { color: var(--text-dim); }
+
+  .why-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--phase-color, var(--accent));
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    display: inline-block;
+    margin-bottom: 2px;
+  }
+
+  .tool-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: 6px;
+  }
+
+  .tool-tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--phase-color, var(--accent));
+    background: color-mix(in srgb, var(--phase-color, var(--accent)) 10%, transparent);
+    border: 1px solid color-mix(in srgb, var(--phase-color, var(--accent)) 25%, transparent);
+    border-radius: 4px;
+    padding: 2px 6px;
+  }
+
+  .difficulty {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    padding: 3px 8px;
+    border-radius: 99px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .diff-easy { color: #00ff88; background: rgba(0,255,136,0.1); }
+  .diff-medium { color: #ffd700; background: rgba(255,215,0,0.1); }
+  .diff-hard { color: #ff6b35; background: rgba(255,107,53,0.1); }
+  .diff-expert { color: #ff4081; background: rgba(255,64,129,0.1); }
+
+  /* Reset button */
+  .footer {
+    text-align: center;
+    margin-top: 40px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+  }
+
+  .reset-btn {
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    color: var(--text-dim);
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .reset-btn:hover { color: var(--accent3); border-color: var(--accent3); }
+
+  .complete-banner {
+    display: none;
+    background: linear-gradient(135deg, rgba(0,255,136,0.1), rgba(0,184,255,0.1));
+    border: 1px solid var(--accent);
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    margin-bottom: 24px;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--accent);
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <span class="tag">// Your personal blueprint</span>
+    <h1>AI Mastery Roadmap</h1>
+    <p>From complete beginner → building offline AI systems, stock predictors, and robotic brains. Check off topics as you learn them.</p>
+  </div>
+
+  <div class="complete-banner" id="completeBanner">
+    🔥 You've completed the entire roadmap. You're now an AI engineer.
+  </div>
+
+  <div class="overall-progress">
+    <div class="progress-circle">
+      <svg viewBox="0 0 80 80">
+        <defs>
+          <linearGradient id="progressGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" style="stop-color:#00ff88"/>
+            <stop offset="100%" style="stop-color:#00b8ff"/>
+          </linearGradient>
+        </defs>
+        <circle class="track" cx="40" cy="40" r="34"/>
+        <circle class="fill" id="circFill" cx="40" cy="40" r="34"
+          stroke-dasharray="213.6" stroke-dashoffset="213.6"/>
+      </svg>
+      <div class="pct" id="pctText">0%</div>
+    </div>
+    <div class="progress-bar-wrap">
+      <div class="progress-info">
+        <h3>Overall Progress</h3>
+        <p id="countText">0 / 0 topics completed</p>
+      </div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="mainBar"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="phases"></div>
+
+  <div class="footer">
+    <button class="reset-btn" onclick="resetAll()">↺ Reset all progress</button>
+  </div>
+</div>
+
+<script>
+const PHASES = [
+  {
+    id: 0, color: '#00ff88',
+    num: 'PHASE 0', title: 'Foundations', sub: 'The bedrock — skip this and everything cracks',
+    topics: [
+      { name: 'Python Basics — variables, loops, functions, OOP',
+        why: 'Python is the #1 language for AI/ML. Every framework (PyTorch, TensorFlow, scikit-learn) is Python. Without this, you literally cannot start.',
+        tools: ['Python 3.x', 'VS Code'], diff: 'easy' },
+      { name: 'Linux & Terminal Commands',
+        why: 'AI tools, servers, Raspberry Pi, and robotics all run on Linux. You need terminal confidence to install tools, run scripts, and manage files.',
+        tools: ['Ubuntu', 'bash', 'WSL2'], diff: 'easy' },
+      { name: 'Git & Version Control',
+        why: 'Every AI project you build needs version control. Git lets you track experiments, collaborate, and not lose your work. GitHub is your portfolio.',
+        tools: ['Git', 'GitHub'], diff: 'easy' },
+      { name: 'Data Structures & Algorithms (basics)',
+        why: 'Understanding arrays, lists, dicts, trees, and graphs is essential for understanding how data flows through AI systems and for writing efficient code.',
+        tools: ['Python DSA'], diff: 'medium' },
+      { name: 'How Computers Work (CPU, RAM, GPU, Memory)',
+        why: 'Your diploma gave you hardware basics — now connect it to software. Understanding why GPU matters for AI, why VRAM is limited, how memory bandwidth affects model speed.',
+        tools: [], diff: 'easy' },
+    ]
+  },
+  {
+    id: 1, color: '#00b8ff',
+    num: 'PHASE 1', title: 'Math for AI', sub: 'The language AI thinks in',
+    topics: [
+      { name: 'Linear Algebra — vectors, matrices, dot products',
+        why: 'Every neural network is just matrix multiplication. Images, text, and data are all stored as matrices. Without this, deep learning is magic you cannot understand or debug.',
+        tools: ['Khan Academy', 'NumPy'], diff: 'medium' },
+      { name: 'Probability & Statistics — mean, variance, distributions',
+        why: 'Machine learning is fundamentally about probability. Loss functions, model uncertainty, stock prediction confidence intervals — all statistics.',
+        tools: ['Khan Academy', 'scipy'], diff: 'medium' },
+      { name: 'Calculus — derivatives, chain rule, gradients',
+        why: 'Gradient descent (how neural networks learn) is just calculus. You need to understand what a gradient is and why going downhill minimizes error.',
+        tools: ['Khan Academy'], diff: 'medium' },
+      { name: 'Discrete Math — logic, sets, graphs',
+        why: 'Your KTU Graph Theory subject is directly useful here. AI planning, knowledge graphs, and decision trees are all discrete math structures.',
+        tools: [], diff: 'medium' },
+    ]
+  },
+  {
+    id: 2, color: '#ff6b35',
+    num: 'PHASE 2', title: 'Python for Data Science', sub: 'Your data toolkit',
+    topics: [
+      { name: 'NumPy — arrays, matrix operations, broadcasting',
+        why: 'NumPy is the foundation of ALL Python data science. Every ML library uses NumPy arrays internally. Master this and the rest feels natural.',
+        tools: ['NumPy'], diff: 'easy' },
+      { name: 'Pandas — DataFrames, data cleaning, manipulation',
+        why: 'Real-world data is messy. Stock market data, sensor readings, user data — Pandas is how you clean, filter, and reshape data before feeding it to AI models.',
+        tools: ['Pandas'], diff: 'medium' },
+      { name: 'Matplotlib & Seaborn — data visualization',
+        why: 'You cannot improve what you cannot see. Visualizing your stock data, model performance, loss curves — this is how you understand what your AI is doing.',
+        tools: ['Matplotlib', 'Seaborn', 'Plotly'], diff: 'easy' },
+      { name: 'Jupyter Notebooks — interactive coding environment',
+        why: 'The standard environment for AI experimentation. Run code cell by cell, see outputs instantly, mix code with notes. Every AI researcher uses Jupyter.',
+        tools: ['Jupyter', 'Google Colab'], diff: 'easy' },
+      { name: 'APIs & JSON — fetching and handling data',
+        why: 'Stock market data, news feeds, sensor data all come via APIs in JSON format. Your stock predictor needs to pull live data from sources like Yahoo Finance.',
+        tools: ['requests', 'yfinance', 'json'], diff: 'easy' },
+    ]
+  },
+  {
+    id: 3, color: '#bf5af2',
+    num: 'PHASE 3', title: 'Machine Learning', sub: 'Teaching machines to learn from data',
+    topics: [
+      { name: 'What is ML — supervised, unsupervised, reinforcement',
+        why: 'The three paradigms cover everything: stock prediction (supervised), pattern discovery (unsupervised), trading agents (reinforcement). You need a mental map of all three.',
+        tools: [], diff: 'easy' },
+      { name: 'Linear & Logistic Regression',
+        why: 'The simplest and most interpretable ML models. Stock prices, sensor calibration, classification — regression is the foundation everything else builds on.',
+        tools: ['scikit-learn'], diff: 'easy' },
+      { name: 'Decision Trees & Random Forests',
+        why: 'Powerful models that are easy to interpret. Great for tabular data (financial data, sensor data). Random forests are surprisingly competitive with deep learning on structured data.',
+        tools: ['scikit-learn'], diff: 'medium' },
+      { name: 'Model Evaluation — accuracy, precision, recall, overfitting',
+        why: 'A model that works on training data but fails in real life is useless. Learning to properly evaluate models is what separates real engineers from script followers.',
+        tools: ['scikit-learn', 'matplotlib'], diff: 'medium' },
+      { name: 'Feature Engineering & Data Preprocessing',
+        why: 'The most important skill in ML. Garbage in = garbage out. Knowing which features to create for stock data (RSI, moving averages, volume trends) can 10x your model.',
+        tools: ['Pandas', 'scikit-learn'], diff: 'hard' },
+      { name: 'Clustering — K-Means, DBSCAN',
+        why: 'Finding hidden patterns with no labels. Useful for customer segmentation, anomaly detection in sensor data, and discovering stock market regimes.',
+        tools: ['scikit-learn'], diff: 'medium' },
+    ]
+  },
+  {
+    id: 4, color: '#ffd700',
+    num: 'PHASE 4', title: 'Deep Learning', sub: 'Where AI gets powerful',
+    topics: [
+      { name: 'Neural Networks — neurons, layers, activation functions',
+        why: 'The core of all modern AI. Understanding how information flows from input to output through weighted layers is the foundation of everything: LLMs, vision, robotics.',
+        tools: ['PyTorch'], diff: 'medium' },
+      { name: 'PyTorch — tensors, autograd, training loops',
+        why: 'PyTorch is the #1 framework for AI research and production. LLaMA, Stable Diffusion, YOLO, Whisper — all PyTorch. This is the tool for everything you want to build.',
+        tools: ['PyTorch', 'CUDA'], diff: 'hard' },
+      { name: 'CNNs — Convolutional Neural Networks (for vision)',
+        why: 'How AI sees images. Your robotic brain needs to recognize objects, faces, obstacles. CNNs are the backbone of all computer vision.',
+        tools: ['PyTorch', 'torchvision'], diff: 'hard' },
+      { name: 'RNNs & LSTMs — sequential and time-series data',
+        why: 'Directly needed for your stock predictor. LSTMs remember patterns over time, making them perfect for predicting price movements based on historical sequences.',
+        tools: ['PyTorch'], diff: 'hard' },
+      { name: 'Transformers & Attention Mechanism',
+        why: 'The architecture behind GPT, LLaMA, BERT — everything. Understanding attention is understanding modern AI. This one concept unlocked the entire LLM revolution.',
+        tools: ['PyTorch', 'HuggingFace'], diff: 'expert' },
+      { name: 'Transfer Learning & Fine-Tuning',
+        why: 'Instead of training from scratch (needs massive compute), you start from a pretrained model and fine-tune it for your task. This is how you build real AI on limited hardware.',
+        tools: ['HuggingFace', 'PyTorch'], diff: 'hard' },
+    ]
+  },
+  {
+    id: 5, color: '#ff4081',
+    num: 'PHASE 5', title: 'LLMs & Local AI', sub: 'Running ChatGPT on your own machine',
+    topics: [
+      { name: 'HuggingFace — models, tokenizers, pipelines',
+        why: 'The GitHub of AI models. 500,000+ pretrained models available for free. Your offline chatbot, sentiment analyzer for stocks, text classifier — all start here.',
+        tools: ['HuggingFace', 'transformers'], diff: 'medium' },
+      { name: 'Running Local LLMs — Ollama, LM Studio',
+        why: 'This is literally how you build your offline AI brain. Run LLaMA 3, Mistral, Phi-3 locally. No internet required. No API costs. Complete privacy.',
+        tools: ['Ollama', 'LM Studio', 'llama.cpp'], diff: 'easy' },
+      { name: 'Prompt Engineering — system prompts, few-shot, chain-of-thought',
+        why: 'How you talk to an LLM determines what you get. For your service chatbot, prompt design is the difference between a useful assistant and a confusing one.',
+        tools: ['Ollama', 'OpenAI API'], diff: 'easy' },
+      { name: 'RAG — Retrieval Augmented Generation',
+        why: 'Give your offline AI a brain connected to your own documents/data. Your service bot can answer from your company documents. Stock AI can reference recent news.',
+        tools: ['LangChain', 'ChromaDB', 'FAISS'], diff: 'hard' },
+      { name: 'LangChain & AI Agents',
+        why: 'Build AI that can USE tools — search the web, write code, read files, call APIs. This is how you build autonomous agents that take actions, not just answer questions.',
+        tools: ['LangChain', 'LlamaIndex'], diff: 'hard' },
+      { name: 'Fine-tuning LLMs on custom data',
+        why: 'Train your chatbot on your specific domain. A stock trading bot fine-tuned on financial language, a service bot fine-tuned on your company knowledge.',
+        tools: ['QLoRA', 'Unsloth', 'HuggingFace'], diff: 'expert' },
+    ]
+  },
+  {
+    id: 6, color: '#00e5ff',
+    num: 'PHASE 6', title: 'Computer Vision', sub: 'Give your AI eyes',
+    topics: [
+      { name: 'OpenCV — image processing, camera input, filters',
+        why: 'The foundation of computer vision in Python. Reading camera feeds, processing frames, detecting edges — this is how your robot sees the world in real-time.',
+        tools: ['OpenCV', 'Python'], diff: 'medium' },
+      { name: 'Object Detection — YOLO (You Only Look Once)',
+        why: 'Detect and identify objects in real-time video. Your humanoid robot needs to recognize people, objects, obstacles. YOLO is fast enough to run in realtime.',
+        tools: ['YOLOv8', 'ultralytics'], diff: 'medium' },
+      { name: 'Depth Estimation & Spatial Awareness',
+        why: 'Knowing an object exists is not enough — your robot needs to know HOW FAR away it is to navigate and interact physically.',
+        tools: ['MiDaS', 'RealSense SDK'], diff: 'hard' },
+      { name: 'Face Recognition & Pose Estimation',
+        why: 'For humanoid robots: recognizing who you are talking to, reading body language, understanding gestures. MediaPipe can run this in real-time on modest hardware.',
+        tools: ['MediaPipe', 'face_recognition'], diff: 'hard' },
+    ]
+  },
+  {
+    id: 7, color: '#69ff47',
+    num: 'PHASE 7', title: 'Speech & Audio AI', sub: 'Give your AI ears and a voice',
+    topics: [
+      { name: 'Whisper — offline speech-to-text',
+        why: 'OpenAI\'s Whisper runs completely offline. Your robot or service chatbot can listen to voice commands without any internet. Runs on your local machine.',
+        tools: ['Whisper', 'faster-whisper'], diff: 'easy' },
+      { name: 'Text-to-Speech (TTS) — offline voice synthesis',
+        why: 'Your humanoid chatbot needs a voice. Coqui TTS, Piper, or Kokoro run offline and sound natural. No cloud needed.',
+        tools: ['Coqui TTS', 'Piper', 'Kokoro'], diff: 'easy' },
+      { name: 'Audio Processing — recording, noise removal, VAD',
+        why: 'Real-world audio is noisy. Voice Activity Detection (knowing when someone is speaking), noise filtering — essential for a robot that operates in real environments.',
+        tools: ['PyAudio', 'librosa', 'silero-vad'], diff: 'medium' },
+    ]
+  },
+  {
+    id: 8, color: '#ff9100',
+    num: 'PHASE 8', title: 'Reinforcement Learning', sub: 'AI that learns by doing',
+    topics: [
+      { name: 'RL Fundamentals — agents, environments, rewards',
+        why: 'RL is how you build AI that makes decisions over time. Trading bots, robot navigation, game-playing AI — all RL. The concept of reward shaping determines everything.',
+        tools: ['Gymnasium'], diff: 'hard' },
+      { name: 'Q-Learning & Deep Q-Networks (DQN)',
+        why: 'The algorithm that learned to play Atari games better than humans. Foundation of all RL. Your stock trading agent needs this to learn buy/sell decisions from market feedback.',
+        tools: ['stable-baselines3', 'PyTorch'], diff: 'hard' },
+      { name: 'Policy Gradient Methods (PPO, A3C)',
+        why: 'More powerful RL algorithms used for continuous action spaces — robot movement, complex trading strategies. PPO is the most practical modern RL algorithm.',
+        tools: ['stable-baselines3'], diff: 'expert' },
+      { name: 'Building a Custom Trading Environment',
+        why: 'Wrap historical stock data into an RL environment. Agent buys/sells, gets reward based on profit/loss. Train it on years of data before risking real money.',
+        tools: ['Gymnasium', 'FinRL', 'backtesting.py'], diff: 'hard' },
+    ]
+  },
+  {
+    id: 9, color: '#e040fb',
+    num: 'PHASE 9', title: 'Stock Market AI', sub: 'Your financial intelligence system',
+    topics: [
+      { name: 'Time Series Analysis — trends, seasonality, stationarity',
+        why: 'Stock prices are time series. Understanding patterns that repeat, removing trends to reveal signals, testing if patterns are real — this is the math behind prediction.',
+        tools: ['statsmodels', 'pandas'], diff: 'hard' },
+      { name: 'Technical Indicators — RSI, MACD, Bollinger Bands',
+        why: 'These are the features your ML model will use. Not raw price — but engineered signals that professional traders have used for decades. Your model learns from these.',
+        tools: ['ta-lib', 'pandas-ta'], diff: 'medium' },
+      { name: 'LSTM for Stock Price Prediction',
+        why: 'LSTMs are the most used deep learning architecture for stock prediction because they handle sequences naturally. Predict tomorrow\'s price from the last 60 days.',
+        tools: ['PyTorch', 'yfinance'], diff: 'hard' },
+      { name: 'Sentiment Analysis on Financial News',
+        why: 'Markets move on news. An LLM that reads headlines and extracts sentiment (positive/negative/neutral) gives your predictor an edge beyond pure price data.',
+        tools: ['HuggingFace', 'FinBERT'], diff: 'hard' },
+      { name: 'Backtesting — testing strategy on historical data',
+        why: 'Never deploy an untested strategy with real money. Backtesting simulates your strategy on past data to see how it would have performed. Prevents disaster.',
+        tools: ['backtesting.py', 'vectorbt'], diff: 'medium' },
+      { name: 'Paper Trading — live testing without real money',
+        why: 'After backtesting, run your bot with fake money in real market conditions. The gap between backtesting and live trading is where most strategies fail.',
+        tools: ['Alpaca API', 'IBKR paper account'], diff: 'medium' },
+    ]
+  },
+  {
+    id: 10, color: '#ff1744',
+    num: 'PHASE 10', title: 'Robotic Brain', sub: 'Bringing it all together into a living system',
+    topics: [
+      { name: 'ROS2 — Robot Operating System',
+        why: 'The Linux of robotics. Every serious robot runs ROS2. It handles sensor data, motor control, navigation, and communication between your AI components.',
+        tools: ['ROS2', 'Ubuntu'], diff: 'expert' },
+      { name: 'Sensor Integration — camera, microphone, IMU, lidar',
+        why: 'A robot brain needs senses. Connecting physical sensors to your AI pipeline: camera → YOLO, microphone → Whisper, distance sensor → navigation. Hardware meets software.',
+        tools: ['ROS2', 'OpenCV', 'RPi'], diff: 'expert' },
+      { name: 'Multimodal Fusion — combining vision + speech + text',
+        why: 'Your humanoid processes EVERYTHING at once. Someone speaks (Whisper), shows an object (YOLO), your LLM brain processes all inputs and decides the response.',
+        tools: ['LangChain', 'custom pipeline'], diff: 'expert' },
+      { name: 'Motor Control & Actuation',
+        why: 'A brain without a body can only talk. Servo control, PWM signals, inverse kinematics — translating AI decisions into physical movement is the hardest engineering challenge.',
+        tools: ['MicroPython', 'Arduino', 'ROS2 control'], diff: 'expert' },
+      { name: 'Edge AI — running models on Raspberry Pi / Jetson Nano',
+        why: 'Your robot cannot carry a desktop PC. Deploying optimized, quantized models on edge hardware (Jetson Nano: $100, powerful) is how real robots work.',
+        tools: ['ONNX', 'TensorRT', 'Jetson Nano'], diff: 'expert' },
+      { name: 'Full System Integration — the complete autonomous agent',
+        why: 'Connecting everything: perception → understanding → decision → action in a real-time loop. This is the final boss. When this works, you have built a real robotic brain.',
+        tools: ['ROS2', 'LangChain', 'PyTorch', 'FastAPI'], diff: 'expert' },
+    ]
+  },
+];
+
+const STORAGE_KEY = 'ai_roadmap_v1';
+let checked = {};
+
+async function loadState() {
+  try {
+    const r = await window.storage.get(STORAGE_KEY);
+    if (r) checked = JSON.parse(r.value);
+  } catch(e) { checked = {}; }
+}
+
+async function saveState() {
+  try { await window.storage.set(STORAGE_KEY, JSON.stringify(checked)); } catch(e) {}
+}
+
+function totalTopics() {
+  return PHASES.reduce((s, p) => s + p.topics.length, 0);
+}
+
+function checkedCount() {
+  return Object.values(checked).filter(Boolean).length;
+}
+
+function updateOverall() {
+  const total = totalTopics();
+  const done = checkedCount();
+  const pct = total ? Math.round(done / total * 100) : 0;
+  document.getElementById('pctText').textContent = pct + '%';
+  document.getElementById('countText').textContent = done + ' / ' + total + ' topics completed';
+  document.getElementById('mainBar').style.width = pct + '%';
+  const circ = document.getElementById('circFill');
+  const circumference = 213.6;
+  circ.style.strokeDashoffset = circumference - (pct / 100) * circumference;
+  document.getElementById('completeBanner').style.display = pct === 100 ? 'block' : 'none';
+}
+
+function updatePhase(phaseEl, phase) {
+  const total = phase.topics.length;
+  const done = phase.topics.filter((t, i) => checked[phase.id + '_' + i]).length;
+  const pct = total ? Math.round(done / total * 100) : 0;
+  phaseEl.querySelector('.mini-bar-fill').style.width = pct + '%';
+  phaseEl.querySelector('.phase-progress-mini span').textContent = done + '/' + total;
+  phaseEl.classList.toggle('has-progress', done > 0 && done < total);
+  phaseEl.classList.toggle('complete', done === total);
+}
+
+function buildUI() {
+  const container = document.getElementById('phases');
+
+  PHASES.forEach((phase, pi) => {
+    const phaseEl = document.createElement('div');
+    phaseEl.className = 'phase';
+    phaseEl.style.setProperty('--phase-color', phase.color);
+
+    const topicsHTML = phase.topics.map((t, ti) => {
+      const key = phase.id + '_' + ti;
+      const isChecked = checked[key] ? 'checked' : '';
+      const diffClass = 'diff-' + t.diff;
+      const toolsHTML = t.tools.length ? `<div class="tool-tags">${t.tools.map(tl => `<span class="tool-tag">${tl}</span>`).join('')}</div>` : '';
+      return `
+        <div class="topic-item ${isChecked}" data-key="${key}" onclick="toggleTopic(this,'${key}','${phase.id}')">
+          <div class="checkbox"><span class="checkbox-tick">✓</span></div>
+          <div class="topic-content">
+            <div class="topic-name">${t.name}</div>
+            <span class="why-label">why it matters</span>
+            <div class="why-matters">${t.why}</div>
+            ${toolsHTML}
+          </div>
+          <span class="difficulty ${diffClass}">${t.diff}</span>
+        </div>`;
+    }).join('');
+
+    const done = phase.topics.filter((_, i) => checked[phase.id + '_' + i]).length;
+    const total = phase.topics.length;
+
+    phaseEl.innerHTML = `
+      <div class="phase-header" onclick="togglePhase(this)">
+        <span class="phase-num">${phase.num}</span>
+        <div class="phase-title-wrap">
+          <div class="phase-title">${phase.title}</div>
+          <div class="phase-sub">${phase.sub}</div>
+        </div>
+        <div class="phase-progress-mini">
+          <div class="mini-bar"><div class="mini-bar-fill" style="width:${total?Math.round(done/total*100):0}%"></div></div>
+          <span>${done}/${total}</span>
+        </div>
+        <span class="chevron">⌄</span>
+      </div>
+      <div class="topics">${topicsHTML}</div>`;
+
+    if (done > 0 && done < total) phaseEl.classList.add('has-progress');
+    if (done === total) phaseEl.classList.add('complete');
+
+    container.appendChild(phaseEl);
+  });
+}
+
+function togglePhase(header) {
+  const phase = header.parentElement;
+  phase.classList.toggle('open');
+}
+
+function toggleTopic(el, key, phaseId) {
+  checked[key] = !checked[key];
+  el.classList.toggle('checked', checked[key]);
+  el.querySelector('.checkbox').style.background = checked[key] ? 'var(--done)' : '';
+  el.querySelector('.checkbox').style.borderColor = checked[key] ? 'var(--done)' : '';
+
+  const phaseEl = el.closest('.phase');
+  const phase = PHASES.find(p => p.id == phaseId);
+  updatePhase(phaseEl, phase);
+  updateOverall();
+  saveState();
+}
+
+async function resetAll() {
+  if (!confirm('Reset all progress?')) return;
+  checked = {};
+  document.querySelectorAll('.topic-item').forEach(el => {
+    el.classList.remove('checked');
+    el.querySelector('.checkbox').style.background = '';
+    el.querySelector('.checkbox').style.borderColor = '';
+  });
+  document.querySelectorAll('.mini-bar-fill').forEach(b => b.style.width = '0%');
+  document.querySelectorAll('.phase').forEach(p => { p.classList.remove('has-progress','complete'); });
+  document.querySelectorAll('.phase-progress-mini span').forEach((s, i) => {
+    const phase = PHASES[i];
+    s.textContent = '0/' + phase.topics.length;
+  });
+  updateOverall();
+  await saveState();
+}
+
+(async () => {
+  await loadState();
+  buildUI();
+  updateOverall();
+})();
+</script>
+</body>
+</html>
