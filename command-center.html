@@ -1,0 +1,2131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NEXUS — Personal Command Center</title>
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+
+  <!-- Google Fonts: Syne (display) + JetBrains Mono (code) + DM Sans (body) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+
+  <style>
+    /* =============================================
+       RESET & CSS VARIABLES
+    ============================================= */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg-void:     #060609;
+      --bg-deep:     #0c0c14;
+      --bg-card:     rgba(255,255,255,0.04);
+      --bg-card-hov: rgba(255,255,255,0.07);
+      --border:      rgba(255,255,255,0.08);
+      --border-glow: rgba(0,212,255,0.3);
+
+      --cyan:   #00d4ff;
+      --purple: #8b5cf6;
+      --green:  #10d98a;
+      --orange: #f59e0b;
+      --red:    #ff4d6d;
+      --white:  #f0f4f8;
+      --muted:  rgba(240,244,248,0.45);
+      --dim:    rgba(240,244,248,0.18);
+
+      --font-display: 'Syne', sans-serif;
+      --font-mono:    'JetBrains Mono', monospace;
+      --font-body:    'DM Sans', sans-serif;
+
+      --radius-sm: 10px;
+      --radius-md: 16px;
+      --radius-lg: 24px;
+
+      --shadow-glow-cyan:   0 0 30px rgba(0,212,255,0.12);
+      --shadow-glow-purple: 0 0 30px rgba(139,92,246,0.12);
+    }
+
+    /* =============================================
+       BASE
+    ============================================= */
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg-void);
+      color: var(--white);
+      font-family: var(--font-body);
+      font-size: 15px;
+      line-height: 1.6;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* =============================================
+       ANIMATED BACKGROUND MESH
+    ============================================= */
+    #bg-canvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* =============================================
+       LAYOUT
+    ============================================= */
+    .site-wrapper {
+      position: relative;
+      z-index: 1;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px 80px;
+    }
+
+    /* =============================================
+       TOP NAV
+    ============================================= */
+    .top-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 28px 0 20px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 40px;
+    }
+
+    .nav-logo {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 1.4rem;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, var(--cyan), var(--purple));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .nav-logo span {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      font-weight: 300;
+      color: var(--muted);
+      -webkit-text-fill-color: var(--muted);
+      background: none;
+      -webkit-background-clip: unset;
+      background-clip: unset;
+      display: block;
+      letter-spacing: 0.18em;
+      margin-top: 2px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .nav-link {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      text-decoration: none;
+      padding: 6px 12px;
+      border-radius: 30px;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      transition: all 0.25s ease;
+      cursor: pointer;
+    }
+
+    .nav-link:hover {
+      color: var(--cyan);
+      border-color: var(--border-glow);
+      background: rgba(0,212,255,0.06);
+    }
+
+    /* =============================================
+       GLASS CARD
+    ============================================= */
+    .glass {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      transition: border-color 0.3s, background 0.3s, transform 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .glass::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+    }
+
+    .glass:hover {
+      background: var(--bg-card-hov);
+      border-color: rgba(255,255,255,0.13);
+    }
+
+    /* =============================================
+       SECTION HEADER
+    ============================================= */
+    .section-label {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .section-title {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 1.5rem;
+      letter-spacing: -0.02em;
+      margin-bottom: 24px;
+    }
+
+    .accent-cyan   { color: var(--cyan); }
+    .accent-purple { color: var(--purple); }
+    .accent-green  { color: var(--green); }
+    .accent-orange { color: var(--orange); }
+
+    /* =============================================
+       GRID HELPERS
+    ============================================= */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+    .mt-8  { margin-top: 8px; }
+    .mt-16 { margin-top: 16px; }
+    .mt-32 { margin-top: 32px; }
+    .mb-32 { margin-bottom: 32px; }
+    .p-24  { padding: 24px; }
+    .p-28  { padding: 28px; }
+    .p-32  { padding: 32px; }
+
+    /* =============================================
+       SECTION 1: TODAY DASHBOARD
+    ============================================= */
+    #today { margin-bottom: 32px; }
+
+    .today-grid {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr 1fr;
+      gap: 20px;
+    }
+
+    /* Date card */
+    .date-card {
+      padding: 32px;
+      background: linear-gradient(135deg, rgba(0,212,255,0.08), rgba(139,92,246,0.08));
+      border-color: rgba(0,212,255,0.2);
+    }
+
+    .date-card .day-number {
+      font-family: var(--font-display);
+      font-size: 5rem;
+      font-weight: 800;
+      line-height: 1;
+      background: linear-gradient(135deg, var(--cyan), var(--purple));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .date-card .day-name {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      letter-spacing: 0.18em;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .date-card .full-date {
+      font-size: 0.9rem;
+      color: var(--white);
+      margin-top: 12px;
+      opacity: 0.8;
+    }
+
+    .live-time {
+      font-family: var(--font-mono);
+      font-size: 1.6rem;
+      color: var(--cyan);
+      margin-top: 10px;
+      letter-spacing: 0.05em;
+    }
+
+    /* Quote card */
+    .quote-card {
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .quote-icon {
+      font-size: 2rem;
+      opacity: 0.2;
+      line-height: 1;
+    }
+
+    .quote-text {
+      font-style: italic;
+      font-size: 0.92rem;
+      color: var(--white);
+      opacity: 0.85;
+      line-height: 1.7;
+      margin: 12px 0;
+    }
+
+    .quote-author {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      color: var(--purple);
+    }
+
+    .btn-refresh-quote {
+      margin-top: 12px;
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      letter-spacing: 0.1em;
+      padding: 6px 14px;
+      border-radius: 30px;
+      cursor: pointer;
+      transition: all 0.2s;
+      width: fit-content;
+    }
+
+    .btn-refresh-quote:hover { color: var(--cyan); border-color: var(--border-glow); }
+
+    /* Focus card */
+    .focus-card { padding: 28px; }
+
+    .focus-label {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      letter-spacing: 0.2em;
+      color: var(--green);
+      margin-bottom: 12px;
+    }
+
+    .focus-input {
+      width: 100%;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--white);
+      font-family: var(--font-body);
+      font-size: 0.92rem;
+      padding: 10px 14px;
+      resize: none;
+      height: 80px;
+      transition: border-color 0.2s;
+      outline: none;
+    }
+
+    .focus-input:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(16,217,138,0.1); }
+    .focus-input::placeholder { color: var(--dim); }
+
+    .mood-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .mood-btn {
+      font-size: 1.3rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      width: 38px; height: 38px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .mood-btn:hover, .mood-btn.active {
+      background: rgba(255,255,255,0.1);
+      transform: scale(1.15);
+      border-color: rgba(255,255,255,0.25);
+    }
+
+    .mood-label {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      color: var(--muted);
+      margin-top: 8px;
+    }
+
+    /* =============================================
+       SECTION 2: PROGRESS TRACKER
+    ============================================= */
+    #progress { margin-bottom: 32px; }
+
+    .progress-layout {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 20px;
+    }
+
+    .progress-main { padding: 28px; }
+
+    .stats-row {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .stat-chip {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 12px 18px;
+      flex: 1;
+      text-align: center;
+    }
+
+    .stat-chip .val {
+      font-family: var(--font-display);
+      font-size: 1.6rem;
+      font-weight: 700;
+    }
+
+    .stat-chip .lbl {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    /* Calendar grid */
+    .cal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
+    .cal-nav-btn {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--white);
+      border-radius: 8px;
+      width: 32px; height: 32px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: all 0.2s;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .cal-nav-btn:hover { border-color: var(--border-glow); color: var(--cyan); }
+
+    .cal-month-title {
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 1rem;
+    }
+
+    .cal-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 6px;
+    }
+
+    .cal-day-name {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      text-align: center;
+      padding-bottom: 6px;
+    }
+
+    .cal-day {
+      aspect-ratio: 1;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      color: var(--muted);
+      position: relative;
+    }
+
+    .cal-day:hover:not(.empty) { border-color: var(--cyan); color: var(--white); }
+    .cal-day.today { border-color: var(--cyan); color: var(--cyan); }
+    .cal-day.done { background: rgba(16,217,138,0.2); border-color: rgba(16,217,138,0.4); color: var(--green); }
+    .cal-day.empty { background: none; border: none; cursor: default; }
+    .cal-day.future { opacity: 0.3; cursor: default; }
+
+    /* Chart side */
+    .chart-side { padding: 28px; }
+
+    .chart-container { position: relative; height: 200px; }
+
+    /* =============================================
+       SECTION 3: ROADMAP
+    ============================================= */
+    #roadmap { margin-bottom: 32px; }
+
+    .roadmap-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .tab-btn {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.1em;
+      padding: 8px 16px;
+      border-radius: 30px;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .tab-btn.active {
+      background: rgba(0,212,255,0.12);
+      border-color: var(--cyan);
+      color: var(--cyan);
+    }
+
+    .roadmap-panel { display: none; padding: 28px; }
+    .roadmap-panel.active { display: block; }
+
+    .roadmap-steps {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .road-step {
+      display: flex;
+      gap: 18px;
+      position: relative;
+    }
+
+    .road-step-line {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .road-dot {
+      width: 14px; height: 14px;
+      border-radius: 50%;
+      border: 2px solid var(--cyan);
+      background: var(--bg-void);
+      position: relative;
+      z-index: 1;
+      flex-shrink: 0;
+    }
+
+    .road-dot.done-dot { background: var(--green); border-color: var(--green); }
+    .road-dot.current-dot { background: var(--cyan); box-shadow: 0 0 10px var(--cyan); }
+
+    .road-connector {
+      width: 1px;
+      flex: 1;
+      min-height: 20px;
+      background: linear-gradient(180deg, var(--border-glow), var(--border));
+    }
+
+    .road-content {
+      padding-bottom: 24px;
+      flex: 1;
+    }
+
+    .road-title {
+      font-weight: 500;
+      font-size: 0.92rem;
+      color: var(--white);
+    }
+
+    .road-desc {
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin-top: 4px;
+      line-height: 1.5;
+    }
+
+    .road-tag {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.08em;
+      padding: 2px 8px;
+      border-radius: 30px;
+      margin-top: 6px;
+    }
+
+    .tag-done   { background: rgba(16,217,138,0.15); color: var(--green); }
+    .tag-now    { background: rgba(0,212,255,0.15); color: var(--cyan); }
+    .tag-next   { background: rgba(139,92,246,0.15); color: var(--purple); }
+    .tag-future { background: rgba(255,255,255,0.07); color: var(--muted); }
+
+    /* =============================================
+       SECTION 4: DAILY ROUTINE
+    ============================================= */
+    #routine { margin-bottom: 32px; }
+
+    .routine-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 14px;
+    }
+
+    .routine-block { padding: 20px; cursor: default; }
+
+    .routine-icon {
+      font-size: 1.6rem;
+      margin-bottom: 10px;
+    }
+
+    .routine-time {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .routine-name {
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 0.88rem;
+      margin-bottom: 8px;
+    }
+
+    .routine-items {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .routine-items li {
+      font-size: 0.78rem;
+      color: var(--muted);
+      padding-left: 14px;
+      position: relative;
+    }
+
+    .routine-items li::before {
+      content: '›';
+      position: absolute;
+      left: 0;
+      color: var(--dim);
+    }
+
+    /* =============================================
+       SECTION 5: MONEY PLAN
+    ============================================= */
+    #money { margin-bottom: 32px; }
+
+    .money-grid {
+      display: grid;
+      grid-template-columns: 260px 1fr 1fr;
+      gap: 20px;
+    }
+
+    .money-balance {
+      padding: 28px;
+      background: linear-gradient(135deg, rgba(16,217,138,0.08), rgba(0,212,255,0.05));
+      border-color: rgba(16,217,138,0.2);
+    }
+
+    .balance-label {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      color: var(--muted);
+    }
+
+    .balance-amount {
+      font-family: var(--font-display);
+      font-size: 2.6rem;
+      font-weight: 800;
+      color: var(--green);
+      line-height: 1.1;
+      margin: 8px 0;
+    }
+
+    .balance-sub {
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .balance-input-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .balance-input {
+      flex: 1;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      color: var(--white);
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      padding: 8px 12px;
+      border-radius: var(--radius-sm);
+      outline: none;
+    }
+
+    .balance-input:focus { border-color: var(--green); }
+
+    .btn-sm {
+      background: rgba(16,217,138,0.15);
+      border: 1px solid rgba(16,217,138,0.3);
+      color: var(--green);
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      padding: 8px 14px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-sm:hover { background: rgba(16,217,138,0.25); }
+
+    .priority-card { padding: 22px; }
+
+    .priority-title {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.15em;
+      color: var(--muted);
+      margin-bottom: 14px;
+    }
+
+    .priority-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .priority-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.85rem;
+    }
+
+    .priority-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    /* =============================================
+       SECTION 6: SKILL TRACKER
+    ============================================= */
+    #skills { margin-bottom: 32px; }
+
+    .skill-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+    }
+
+    .skill-card { padding: 20px; }
+
+    .skill-icon {
+      font-size: 1.4rem;
+      margin-bottom: 8px;
+    }
+
+    .skill-name {
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 0.9rem;
+      margin-bottom: 4px;
+    }
+
+    .skill-level {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+
+    .progress-bar-wrap {
+      height: 4px;
+      background: rgba(255,255,255,0.07);
+      border-radius: 99px;
+      overflow: hidden;
+      margin-bottom: 8px;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      border-radius: 99px;
+      transition: width 1s cubic-bezier(0.4,0,0.2,1);
+    }
+
+    .skill-pct {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--muted);
+    }
+
+    .skill-controls {
+      display: flex;
+      gap: 6px;
+      margin-top: 10px;
+    }
+
+    .skill-btn {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--white);
+      border-radius: 6px;
+      width: 26px; height: 26px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .skill-btn:hover { border-color: var(--cyan); color: var(--cyan); }
+
+    /* =============================================
+       SECTION 7: NOTES
+    ============================================= */
+    #notes { margin-bottom: 32px; }
+
+    .notes-layout {
+      display: grid;
+      grid-template-columns: 1fr 300px;
+      gap: 20px;
+    }
+
+    .notes-editor { padding: 28px; }
+
+    .notes-title-input {
+      width: 100%;
+      background: none;
+      border: none;
+      color: var(--white);
+      font-family: var(--font-display);
+      font-size: 1.2rem;
+      font-weight: 600;
+      outline: none;
+      margin-bottom: 12px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .notes-title-input::placeholder { color: var(--dim); }
+
+    .notes-textarea {
+      width: 100%;
+      height: 220px;
+      background: none;
+      border: none;
+      color: rgba(240,244,248,0.8);
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      line-height: 1.75;
+      outline: none;
+      resize: none;
+    }
+
+    .notes-textarea::placeholder { color: var(--dim); }
+
+    .notes-toolbar {
+      display: flex;
+      gap: 10px;
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+      align-items: center;
+    }
+
+    .btn-save-note {
+      background: rgba(0,212,255,0.12);
+      border: 1px solid rgba(0,212,255,0.3);
+      color: var(--cyan);
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      padding: 8px 18px;
+      border-radius: 30px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-save-note:hover { background: rgba(0,212,255,0.22); }
+
+    .btn-clear-note {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      padding: 8px 18px;
+      border-radius: 30px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-clear-note:hover { color: var(--red); border-color: rgba(255,77,109,0.4); }
+
+    .notes-count {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      color: var(--dim);
+      margin-left: auto;
+    }
+
+    /* Saved notes list */
+    .notes-list-panel { padding: 22px; }
+
+    .notes-list-title {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.15em;
+      color: var(--muted);
+      margin-bottom: 14px;
+    }
+
+    .note-item {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 12px 14px;
+      margin-bottom: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .note-item:hover { border-color: rgba(0,212,255,0.3); background: rgba(0,212,255,0.04); }
+
+    .note-item-title {
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--white);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .note-item-preview {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-top: 3px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .note-item-date {
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      color: var(--dim);
+      margin-top: 6px;
+    }
+
+    .note-delete {
+      float: right;
+      background: none;
+      border: none;
+      color: var(--dim);
+      cursor: pointer;
+      font-size: 0.85rem;
+      padding: 0;
+      line-height: 1;
+      transition: color 0.2s;
+    }
+
+    .note-delete:hover { color: var(--red); }
+
+    /* =============================================
+       TOAST NOTIFICATION
+    ============================================= */
+    .toast {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      background: rgba(16,217,138,0.15);
+      border: 1px solid rgba(16,217,138,0.3);
+      color: var(--green);
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      letter-spacing: 0.08em;
+      padding: 12px 22px;
+      border-radius: 30px;
+      backdrop-filter: blur(20px);
+      z-index: 999;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.3s;
+      pointer-events: none;
+    }
+
+    .toast.show { opacity: 1; transform: translateY(0); }
+
+    /* =============================================
+       FOOTER
+    ============================================= */
+    .footer {
+      text-align: center;
+      padding: 40px 0 10px;
+      border-top: 1px solid var(--border);
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      letter-spacing: 0.12em;
+      color: var(--dim);
+    }
+
+    /* =============================================
+       ANIMATIONS
+    ============================================= */
+    @keyframes fadeSlideIn {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes pulse-glow {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(0,212,255,0.3); }
+      50%       { box-shadow: 0 0 20px 6px rgba(0,212,255,0.12); }
+    }
+
+    .glass { animation: fadeSlideIn 0.5s ease both; }
+    .today-grid .glass:nth-child(1) { animation-delay: 0.05s; }
+    .today-grid .glass:nth-child(2) { animation-delay: 0.1s; }
+    .today-grid .glass:nth-child(3) { animation-delay: 0.15s; }
+
+    .cal-day.today { animation: pulse-glow 2s infinite; }
+
+    /* =============================================
+       RESPONSIVE
+    ============================================= */
+    @media (max-width: 900px) {
+      .today-grid { grid-template-columns: 1fr 1fr; }
+      .today-grid .date-card { grid-column: 1 / -1; }
+      .progress-layout { grid-template-columns: 1fr; }
+      .routine-grid { grid-template-columns: repeat(3, 1fr); }
+      .money-grid { grid-template-columns: 1fr 1fr; }
+      .money-balance { grid-column: 1 / -1; }
+      .skill-grid { grid-template-columns: repeat(2, 1fr); }
+      .notes-layout { grid-template-columns: 1fr; }
+      .roadmap-panel { padding: 20px; }
+    }
+
+    @media (max-width: 600px) {
+      .today-grid { grid-template-columns: 1fr; }
+      .grid-2 { grid-template-columns: 1fr; }
+      .grid-3 { grid-template-columns: 1fr; }
+      .routine-grid { grid-template-columns: repeat(2, 1fr); }
+      .money-grid { grid-template-columns: 1fr; }
+      .skill-grid { grid-template-columns: repeat(2, 1fr); }
+      .nav-links { display: none; }
+      .date-card .day-number { font-size: 3.5rem; }
+      .balance-amount { font-size: 2rem; }
+      .section-title { font-size: 1.2rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- =============================================
+     ANIMATED BACKGROUND
+============================================= -->
+<canvas id="bg-canvas"></canvas>
+
+<!-- =============================================
+     TOAST
+============================================= -->
+<div class="toast" id="toast"></div>
+
+<!-- =============================================
+     MAIN WRAPPER
+============================================= -->
+<div class="site-wrapper">
+
+  <!-- NAV -->
+  <nav class="top-nav">
+    <div class="nav-logo">
+      NEXUS
+      <span>PERSONAL COMMAND CENTER</span>
+    </div>
+    <div class="nav-links">
+      <a class="nav-link" onclick="scrollTo('#today')">Today</a>
+      <a class="nav-link" onclick="scrollTo('#progress')">Progress</a>
+      <a class="nav-link" onclick="scrollTo('#roadmap')">Roadmap</a>
+      <a class="nav-link" onclick="scrollTo('#routine')">Routine</a>
+      <a class="nav-link" onclick="scrollTo('#money')">Money</a>
+      <a class="nav-link" onclick="scrollTo('#skills')">Skills</a>
+      <a class="nav-link" onclick="scrollTo('#notes')">Notes</a>
+    </div>
+  </nav>
+
+  <!-- =============================================
+       SECTION 1: TODAY DASHBOARD
+  ============================================= -->
+  <section id="today" class="mb-32">
+    <div class="section-label">01 — COMMAND CENTER</div>
+    <div class="section-title">Today's <span class="accent-cyan">Overview</span></div>
+
+    <div class="today-grid">
+      <!-- Date + Time -->
+      <div class="glass date-card">
+        <div class="day-number" id="day-number">--</div>
+        <div class="day-name" id="day-name">LOADING...</div>
+        <div class="full-date" id="full-date">---</div>
+        <div class="live-time" id="live-time">--:--:--</div>
+      </div>
+
+      <!-- Motivational Quote -->
+      <div class="glass quote-card">
+        <div>
+          <div class="quote-icon">"</div>
+          <div class="quote-text" id="quote-text">Loading wisdom...</div>
+          <div class="quote-author" id="quote-author">— ---</div>
+        </div>
+        <button class="btn-refresh-quote" onclick="refreshQuote()">↻ NEW QUOTE</button>
+      </div>
+
+      <!-- Daily Focus -->
+      <div class="glass focus-card">
+        <div class="focus-label">◉ TODAY'S MAIN FOCUS</div>
+        <textarea class="focus-input" id="focus-task" placeholder="What's your ONE focus today? e.g. Complete OS exam chapter 3..." oninput="saveFocus()"></textarea>
+        <div class="mood-label">How do you feel?</div>
+        <div class="mood-row">
+          <button class="mood-btn" onclick="setMood(this,'🔥')" title="Fired up">🔥</button>
+          <button class="mood-btn" onclick="setMood(this,'⚡')" title="Electric">⚡</button>
+          <button class="mood-btn" onclick="setMood(this,'😤')" title="Focused">😤</button>
+          <button class="mood-btn" onclick="setMood(this,'😴')" title="Tired">😴</button>
+          <button class="mood-btn" onclick="setMood(this,'😰')" title="Stressed">😰</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =============================================
+       SECTION 2: MONTHLY PROGRESS TRACKER
+  ============================================= -->
+  <section id="progress" class="mb-32">
+    <div class="section-label">02 — DISCIPLINE ENGINE</div>
+    <div class="section-title">Monthly <span class="accent-green">Progress</span></div>
+
+    <div class="progress-layout">
+      <!-- Calendar -->
+      <div class="glass progress-main">
+        <div class="stats-row">
+          <div class="stat-chip">
+            <div class="val accent-cyan" id="stat-streak">0</div>
+            <div class="lbl">🔥 STREAK</div>
+          </div>
+          <div class="stat-chip">
+            <div class="val accent-green" id="stat-pct">0%</div>
+            <div class="lbl">✓ DONE</div>
+          </div>
+          <div class="stat-chip">
+            <div class="val accent-orange" id="stat-days">0</div>
+            <div class="lbl">DAYS LEFT</div>
+          </div>
+        </div>
+
+        <div class="cal-header">
+          <button class="cal-nav-btn" onclick="changeMonth(-1)">‹</button>
+          <div class="cal-month-title" id="cal-month-title">---</div>
+          <button class="cal-nav-btn" onclick="changeMonth(1)">›</button>
+        </div>
+
+        <div class="cal-grid" id="cal-grid">
+          <!-- injected by JS -->
+        </div>
+      </div>
+
+      <!-- Chart -->
+      <div class="glass chart-side">
+        <div class="section-label" style="margin-bottom:4px;">WEEKLY ACTIVITY</div>
+        <div style="font-family:var(--font-display);font-weight:600;font-size:0.95rem;margin-bottom:18px;">Last 4 Weeks</div>
+        <div class="chart-container">
+          <canvas id="progressChart"></canvas>
+        </div>
+        <div style="margin-top:18px;padding-top:16px;border-top:1px solid var(--border);">
+          <div class="section-label" style="margin-bottom:8px;">QUICK LOG</div>
+          <div style="font-size:0.82rem;color:var(--muted);line-height:1.6;">
+            Click any date on the calendar to toggle your daily completion. Green = done, today pulses in cyan.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =============================================
+       SECTION 3: ROADMAP
+  ============================================= -->
+  <section id="roadmap" class="mb-32">
+    <div class="section-label">03 — NAVIGATION SYSTEM</div>
+    <div class="section-title">Your <span class="accent-purple">Roadmaps</span></div>
+
+    <div class="roadmap-tabs">
+      <button class="tab-btn active" onclick="switchTab('aiml')">🤖 AI/ML Path</button>
+      <button class="tab-btn" onclick="switchTab('exam')">📚 Exam Clearing</button>
+      <button class="tab-btn" onclick="switchTab('job')">💼 Job Skills</button>
+      <button class="tab-btn" onclick="switchTab('finance')">💰 Financial Freedom</button>
+    </div>
+
+    <!-- AI/ML Roadmap -->
+    <div class="glass roadmap-panel active" id="panel-aiml">
+      <div class="roadmap-steps">
+        <div class="road-step">
+          <div class="road-step-line"><div class="road-dot done-dot"></div><div class="road-connector"></div></div>
+          <div class="road-content"><div class="road-title">Python Fundamentals</div><div class="road-desc">Variables, loops, functions, OOP, file handling, libraries</div><span class="road-tag tag-done">✓ COMPLETED</span></div>
+        </div>
+        <div class="road-step">
+          <div class="road-step-line"><div class="road-dot done-dot"></div><div class="road-connector"></div></div>
+          <div class="road-content"><div class="road-title">Data Structures & Algorithms</div><div class="road-desc">Arrays, linked lists, trees, graphs, sorting, searching</div><span class="road-tag tag-done">✓ COMPLETED</span></div>
+        </div>
+        <div class="road-step">
+          <div class="road-step-line"><div class="road-dot current-dot"></div><div class="road-connector"></div></div>
+          <div class="road-content"><div class="road-title">Mathematics for ML</div><div class="road-desc">Linear algebra, calculus, probability, statistics — KTU Graph Theory aligns here</div><span class="road-tag tag-now">→ IN PROGRESS</span></div>
+        </div>
+        <div class="road-step">
+          <div class="road-step-line"><div class="road-dot"></div><div class="road-connector"></div></div>
+          <div class="road-content"><div class="road-title">NumPy, Pandas, Matplotlib</div><div class="road-desc">Data manipulation, visualization, EDA skills</div><span class="road-tag tag-next">NEXT UP</span></div>
+        </div>
+        <div class="road-step">
+          <div class="road-step-line"><div class="road-dot"></div><div class="road-connector"></div></div>
+          <div class="road-content"><div class="road-title">Scikit-learn & Classic ML</div><div class="road-desc">Regression, classification, clustering, evaluation metrics</div><span class="road-tag tag-future">UPCOMING</span></div>
+        </div>
+        <div class="road-step">
+          <div class="road-step-line"><div class="road-dot"></div><div class="road-connector"></div></div>
+          <div class="road-content"><div class="road-title">Deep Learning — PyTorch/TF</div><div class="road-desc">Neural nets, CNNs, RNNs, transformers, LLMs</div><span class="road-tag tag-future">UPCOMING</span></div>
+        </div>
+        <div class="road-step">
+          <div class="road-step-line"><div class="road-dot"></div><div class="road-connector"></div></div>
+          <div class="road-content"><div class="road-title">Projects + Kaggle + GitHub</div><div class="road-desc">Build real portfolio, compete, get recognized</div><span class="road-tag tag-future">UPCOMING</span></div>
+        </div>
+        <div class="road-step">
+          <div class="road-step-line"><div class="road-dot"></div></div>
+          <div class="road-content"><div class="road-title">Offline AI Systems (Goal)</div><div class="road-desc">Run local LLMs, build autonomous AI tools, edge computing</div><span class="road-tag tag-future">VISION</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Exam Roadmap -->
+    <div class="glass roadmap-panel" id="panel-exam">
+      <div class="roadmap-steps">
+        <div class="road-step">
+          <div class="road-step-line"><div class="road-dot done-dot"></div><div class="road-connector"></div></div>
+          <div class="road-content"><div class="road-title">Graph Theory (Maths)</div><div class="road-desc">Apr 27 — Graphs, trees, coloring, shortest paths, Euler & Hamilton</div><span class="road-tag tag-done">✓ DONE</span></div>
+        </div>
+        <div class="road-step">
+          <div class="road-step-line"><div class="road-dot done-dot"></div><div class="road-connector"></div></div>
+          <div class="road-content"><div class="road-title">Fundamentals of AI</div><div class="road-desc">Apr 29 — Search, logic, planning, Wumpus, FOL</div><span class="road-tag tag-done">✓ DONE</span></div>
+        </div>
+        <div class="road-step">
+          <div class="road-step-line"><div class="road-dot current-dot"></div><div class="road-connector"></div></div>
+          <div class="road-content"><div class="road-title">Operating Systems</div><div class="road-desc">May 4 — Scheduling, memory, paging, Banker's algorithm, disk I/O</div><span class="road-tag tag-now">→ TODAY</span></div>
+        </div>
+        <div class="road-step">
+          <div class="road-step-line"><div class="road-dot"></div><div class="road-connector"></div></div>
+          <div class="road-content"><div class="road-title">Database Systems</div><div class="road-desc">May 7 — SQL, normalization, ER diagrams, transactions, ACID</div><span class="road-tag tag-next">MAY 7</span></div>
+        </div>
+        <div class="road-step">
+          <div class="road-step-line"><div class="road-dot"></div><div class="road-connector"></div></div>
+          <div class="road-content"><div class="road-title">Advanced Data Structures</div><div class="road-desc">May 11 — AVL, B-trees, heaps, hashing, graph algorithms</div><span class="road-tag tag-next">MAY 11</span></div>
+        </div>
+        <div class="road-step">
+          <div class="road-step-line"><div class="road-dot"></div></div>
+          <div class="road-content"><div class="road-title">Economics</div><div class="road-desc">May 14 — Microeconomics, macroeconomics, Indian economy basics</div><span class="road-tag tag-next">MAY 14</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Job Skills Roadmap -->
+    <div class="glass roadmap-panel" id="panel-job">
+      <div class="roadmap-steps">
+        <div class="road-step">
+          <div class="road-step-line"><div class="road-dot done-dot"></div><div class="road-connector"></div></div>
+          <div class="road-content"><div class="road-title">Core CS Foundation</div><div class="road-desc">OS, DBMS, Networks, OOP — cleared in exams + self-study</div><span class="road-tag tag-done">✓ SOLID</span></div>
+        </div>
+        <div class="road-step">
+          <div class="road-step-line"><div class="road-dot current-dot"></div><div class="road-connector"></div></div>
+          <div class="road-content"><div class="road-title">Python + DSA Practice</div><div class="road-desc">LeetCode easy→medium, pattern recognition, time complexity</div><span class="road-tag tag-now">→ ACTIVE</span></div>
+        </div>
+        <div class="road-step">
+          <div class="road-step-line"><div class="road-dot"></div><div class="road-connector"></div></div>
+          <div class="road-content"><div class="road-title">GitHub Portfolio</div><div class="road-desc">3–5 real projects, clean READMEs, consistent commits</div><span class="road-tag tag-next">BUILD NOW</span></div>
+        </div>
+        <div class="road-step">
+          <div class="road-step-line"><div class="road-dot"></div><div class="road-connector"></div></div>
+          <div class="road-content"><div class="road-title">ML/AI Project Portfolio</div><div class="road-desc">End-to-end deployed model, Kaggle notebook, research replication</div><span class="road-tag tag-future">POST-EXAM</span></div>
+        </div>
+        <div class="road-step">
+          <div class="road-step-line"><div class="road-dot"></div><div class="road-connector"></div></div>
+          <div class="road-content"><div class="road-title">Internship / Freelance</div><div class="road-desc">Apply via LinkedIn, Internshala, Upwork — AI/ML or web dev roles</div><span class="road-tag tag-future">S5 GOAL</span></div>
+        </div>
+        <div class="road-step">
+          <div class="road-step-line"><div class="road-dot"></div></div>
+          <div class="road-content"><div class="road-title">Full-time Job / Own Venture</div><div class="road-desc">AI engineer role or launch your own product/company</div><span class="road-tag tag-future">FINAL GOAL</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Financial Freedom Roadmap -->
+    <div class="glass roadmap-panel" id="panel-finance">
+      <div class="roadmap-steps">
+        <div class="road-step">
+          <div class="road-step-line"><div class="road-dot current-dot"></div><div class="road-connector"></div></div>
+          <div class="road-content"><div class="road-title">Survive & Save (Now)</div><div class="road-desc">Cover exam fees, bike maintenance. Zero impulse buying. Every rupee has a job.</div><span class="road-tag tag-now">→ NOW</span></div>
+        </div>
+        <div class="road-step">
+          <div class="road-step-line"><div class="road-dot"></div><div class="road-connector"></div></div>
+          <div class="road-content"><div class="road-title">First Side Income</div><div class="road-desc">Honey business, freelance, Swiggy delivery, any consistent flow → ₹3,000–10,000/mo</div><span class="road-tag tag-next">POST-EXAM</span></div>
+        </div>
+        <div class="road-step">
+          <div class="road-step-line"><div class="road-dot"></div><div class="road-connector"></div></div>
+          <div class="road-content"><div class="road-title">Emergency Fund</div><div class="road-desc">3 months expenses saved. Untouchable. Gives mental freedom to take risks.</div><span class="road-tag tag-future">YEAR 1</span></div>
+        </div>
+        <div class="road-step">
+          <div class="road-step-line"><div class="road-dot"></div><div class="road-connector"></div></div>
+          <div class="road-content"><div class="road-title">Invest in Skills → Salary</div><div class="road-desc">Land internship/job. Income from ML/dev skills, not just delivery. Scale fast.</div><span class="road-tag tag-future">YEAR 2</span></div>
+        </div>
+        <div class="road-step">
+          <div class="road-step-line"><div class="road-dot"></div><div class="road-connector"></div></div>
+          <div class="road-content"><div class="road-title">Invest — Stocks + Index Funds</div><div class="road-desc">Disciplined SIPs, no intraday. Long-term wealth. Study before investing.</div><span class="road-tag tag-future">YEAR 2–3</span></div>
+        </div>
+        <div class="road-step">
+          <div class="road-step-line"><div class="road-dot"></div></div>
+          <div class="road-content"><div class="road-title">Autonomous Life — Farm + EV + Company</div><div class="road-desc">Solar farm, natural food company, EV, complete self-reliance. The vision.</div><span class="road-tag tag-future">LONG TERM</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =============================================
+       SECTION 4: DAILY ROUTINE
+  ============================================= -->
+  <section id="routine" class="mb-32">
+    <div class="section-label">04 — OPERATING PROTOCOL</div>
+    <div class="section-title">Daily <span class="accent-orange">Routine</span></div>
+
+    <div class="routine-grid">
+      <div class="glass routine-block" style="border-color:rgba(251,191,36,0.2);background:linear-gradient(135deg,rgba(251,191,36,0.05),rgba(255,255,255,0.02))">
+        <div class="routine-icon">🌅</div>
+        <div class="routine-time">5:30 — 7:00 AM</div>
+        <div class="routine-name accent-orange">Morning Boot</div>
+        <ul class="routine-items">
+          <li>Wake up — no phone for 30 min</li>
+          <li>Cold water, hydrate</li>
+          <li>10 min meditation / breathing</li>
+          <li>Review today's focus goal</li>
+          <li>Light breakfast</li>
+        </ul>
+      </div>
+
+      <div class="glass routine-block" style="border-color:rgba(0,212,255,0.2);background:linear-gradient(135deg,rgba(0,212,255,0.05),rgba(255,255,255,0.02))">
+        <div class="routine-icon">📖</div>
+        <div class="routine-time">7:00 — 1:00 PM</div>
+        <div class="routine-name accent-cyan">Study Blocks</div>
+        <ul class="routine-items">
+          <li>25 min Pomodoro sessions</li>
+          <li>5 min break between each</li>
+          <li>Priority subject first</li>
+          <li>No social media during blocks</li>
+          <li>Take notes, not just read</li>
+        </ul>
+      </div>
+
+      <div class="glass routine-block" style="border-color:rgba(139,92,246,0.2);background:linear-gradient(135deg,rgba(139,92,246,0.05),rgba(255,255,255,0.02))">
+        <div class="routine-icon">💻</div>
+        <div class="routine-time">2:00 — 5:00 PM</div>
+        <div class="routine-name accent-purple">Code Practice</div>
+        <ul class="routine-items">
+          <li>1 LeetCode / problem per day</li>
+          <li>Python hands-on practice</li>
+          <li>Work on active project</li>
+          <li>Push to GitHub</li>
+          <li>Document what you built</li>
+        </ul>
+      </div>
+
+      <div class="glass routine-block" style="border-color:rgba(16,217,138,0.2);background:linear-gradient(135deg,rgba(16,217,138,0.05),rgba(255,255,255,0.02))">
+        <div class="routine-icon">🏋️</div>
+        <div class="routine-time">5:30 — 6:30 PM</div>
+        <div class="routine-name accent-green">Fitness</div>
+        <ul class="routine-items">
+          <li>Calisthenics / martial arts</li>
+          <li>Push-ups, pull-ups, planks</li>
+          <li>20 min cardio / walk</li>
+          <li>Stretch & cool down</li>
+          <li>Strong body = sharp mind</li>
+        </ul>
+      </div>
+
+      <div class="glass routine-block" style="border-color:rgba(255,77,109,0.2);background:linear-gradient(135deg,rgba(255,77,109,0.05),rgba(255,255,255,0.02))">
+        <div class="routine-icon">🌙</div>
+        <div class="routine-time">9:00 — 10:30 PM</div>
+        <div class="routine-name" style="color:var(--red)">Night Review</div>
+        <ul class="routine-items">
+          <li>What did I complete today?</li>
+          <li>What did I skip & why?</li>
+          <li>Plan tomorrow's focus</li>
+          <li>10 min reading (non-screen)</li>
+          <li>Lights off by 11 PM</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- =============================================
+       SECTION 5: MONEY PLAN
+  ============================================= -->
+  <section id="money" class="mb-32">
+    <div class="section-label">05 — FINANCIAL OS</div>
+    <div class="section-title">Money <span class="accent-green">Intelligence</span></div>
+
+    <div class="money-grid">
+      <!-- Balance -->
+      <div class="glass money-balance">
+        <div class="balance-label">CURRENT BALANCE</div>
+        <div class="balance-amount" id="balance-display">₹1,200</div>
+        <div class="balance-sub">Every rupee has a purpose.</div>
+        <div class="balance-input-row">
+          <input class="balance-input" type="number" id="balance-input" placeholder="Update amount" />
+          <button class="btn-sm" onclick="updateBalance()">SET</button>
+        </div>
+      </div>
+
+      <!-- Priorities -->
+      <div class="glass priority-card">
+        <div class="priority-title">SPEND PRIORITIES</div>
+        <div class="priority-list">
+          <div class="priority-item">
+            <div class="priority-dot" style="background:var(--red)"></div>
+            <span>📚 Exam fees & materials — <strong>Non-negotiable</strong></span>
+          </div>
+          <div class="priority-item">
+            <div class="priority-dot" style="background:var(--orange)"></div>
+            <span>🏍️ Bike maintenance — Transportation = income</span>
+          </div>
+          <div class="priority-item">
+            <div class="priority-dot" style="background:var(--cyan)"></div>
+            <span>📱 Phone repair — Needed for Swiggy income</span>
+          </div>
+          <div class="priority-item">
+            <div class="priority-dot" style="background:var(--green)"></div>
+            <span>💾 WiFi — For skill-building & income</span>
+          </div>
+          <div class="priority-item">
+            <div class="priority-dot" style="background:var(--purple)"></div>
+            <span>🏦 Savings — Even ₹100/day compounds</span>
+          </div>
+          <div class="priority-item">
+            <div class="priority-dot" style="background:var(--dim)"></div>
+            <span style="color:var(--muted)">❌ Impulse buying — Just don't.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Rules -->
+      <div class="glass priority-card">
+        <div class="priority-title">MONEY RULES</div>
+        <div class="priority-list">
+          <div class="priority-item">
+            <div class="priority-dot" style="background:var(--cyan)"></div>
+            <span>Wait 24h before any non-essential purchase</span>
+          </div>
+          <div class="priority-item">
+            <div class="priority-dot" style="background:var(--green)"></div>
+            <span>Ask: "Is this need or want?" before spending</span>
+          </div>
+          <div class="priority-item">
+            <div class="priority-dot" style="background:var(--orange)"></div>
+            <span>Track every expense — awareness is power</span>
+          </div>
+          <div class="priority-item">
+            <div class="priority-dot" style="background:var(--purple)"></div>
+            <span>Invest in skills before things</span>
+          </div>
+          <div class="priority-item">
+            <div class="priority-dot" style="background:var(--red)"></div>
+            <span>No intraday trading — long-term only</span>
+          </div>
+          <div class="priority-item">
+            <div class="priority-dot" style="background:var(--green)"></div>
+            <span>Rich Dad principle: assets first, luxuries later</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =============================================
+       SECTION 6: SKILL TRACKER
+  ============================================= -->
+  <section id="skills" class="mb-32">
+    <div class="section-label">06 — SKILL MATRIX</div>
+    <div class="section-title">Project & <span class="accent-purple">Skill</span> Tracker</div>
+
+    <div class="skill-grid" id="skill-grid">
+      <!-- Injected by JS -->
+    </div>
+  </section>
+
+  <!-- =============================================
+       SECTION 7: NOTES
+  ============================================= -->
+  <section id="notes" class="mb-32">
+    <div class="section-label">07 — KNOWLEDGE VAULT</div>
+    <div class="section-title">Notes <span class="accent-cyan">Area</span></div>
+
+    <div class="notes-layout">
+      <!-- Editor -->
+      <div class="glass notes-editor">
+        <input class="notes-title-input" id="note-title" type="text" placeholder="Note title..." />
+        <textarea class="notes-textarea" id="note-body" placeholder="Start typing your note... Ideas, formulas, to-dos, reflections, anything.&#10;&#10;Use this space freely."></textarea>
+        <div class="notes-toolbar">
+          <button class="btn-save-note" onclick="saveNote()">+ SAVE NOTE</button>
+          <button class="btn-clear-note" onclick="clearNoteEditor()">✕ CLEAR</button>
+          <div class="notes-count" id="note-char-count">0 chars</div>
+        </div>
+      </div>
+
+      <!-- Saved Notes List -->
+      <div class="glass notes-list-panel">
+        <div class="notes-list-title">SAVED NOTES (<span id="note-count">0</span>)</div>
+        <div id="notes-list">
+          <!-- injected by JS -->
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    NEXUS v1.0 — Built for Aswin · Powered by discipline, not motivation · All data stored locally
+  </div>
+
+</div><!-- end site-wrapper -->
+
+<!-- =============================================
+     JAVASCRIPT
+============================================= -->
+<script>
+
+/* ============================================
+   BACKGROUND CANVAS ANIMATION
+============================================ */
+(function() {
+  const canvas = document.getElementById('bg-canvas');
+  const ctx = canvas.getContext('2d');
+  let W, H, particles = [];
+
+  function resize() {
+    W = canvas.width  = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  // Create particles
+  for (let i = 0; i < 60; i++) {
+    particles.push({
+      x: Math.random() * W,
+      y: Math.random() * H,
+      r: Math.random() * 1.5 + 0.3,
+      dx: (Math.random() - 0.5) * 0.3,
+      dy: (Math.random() - 0.5) * 0.3,
+      alpha: Math.random() * 0.4 + 0.05
+    });
+  }
+
+  // Gradient orbs
+  const orbs = [
+    { x: 0.15, y: 0.2,  color: '0,212,255',   r: 400 },
+    { x: 0.85, y: 0.7,  color: '139,92,246',  r: 350 },
+    { x: 0.5,  y: 0.95, color: '16,217,138',  r: 280 }
+  ];
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+
+    // Draw orbs
+    orbs.forEach(o => {
+      const grd = ctx.createRadialGradient(o.x*W, o.y*H, 0, o.x*W, o.y*H, o.r);
+      grd.addColorStop(0, `rgba(${o.color},0.05)`);
+      grd.addColorStop(1, 'transparent');
+      ctx.fillStyle = grd;
+      ctx.fillRect(0, 0, W, H);
+    });
+
+    // Draw particles
+    particles.forEach(p => {
+      p.x += p.dx; p.y += p.dy;
+      if (p.x < 0 || p.x > W) p.dx *= -1;
+      if (p.y < 0 || p.y > H) p.dy *= -1;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(0,212,255,${p.alpha})`;
+      ctx.fill();
+    });
+
+    // Draw connecting lines
+    for (let i = 0; i < particles.length; i++) {
+      for (let j = i + 1; j < particles.length; j++) {
+        const dx = particles[i].x - particles[j].x;
+        const dy = particles[i].y - particles[j].y;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        if (dist < 120) {
+          ctx.beginPath();
+          ctx.moveTo(particles[i].x, particles[i].y);
+          ctx.lineTo(particles[j].x, particles[j].y);
+          ctx.strokeStyle = `rgba(0,212,255,${0.06 * (1 - dist/120)})`;
+          ctx.lineWidth = 0.5;
+          ctx.stroke();
+        }
+      }
+    }
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+
+/* ============================================
+   SCROLL HELPER
+============================================ */
+function scrollTo(selector) {
+  const el = document.querySelector(selector);
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+
+/* ============================================
+   TOAST NOTIFICATION
+============================================ */
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+
+/* ============================================
+   DATE & TIME
+============================================ */
+function updateDateTime() {
+  const now = new Date();
+  const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+  document.getElementById('day-number').textContent = now.getDate();
+  document.getElementById('day-name').textContent = days[now.getDay()].toUpperCase();
+  document.getElementById('full-date').textContent = `${months[now.getMonth()]} ${now.getFullYear()}`;
+  document.getElementById('live-time').textContent =
+    now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+}
+
+updateDateTime();
+setInterval(updateDateTime, 1000);
+
+
+/* ============================================
+   MOTIVATIONAL QUOTES
+============================================ */
+const quotes = [
+  { text: "Discipline is choosing between what you want now and what you want most.", author: "Abraham Lincoln" },
+  { text: "The man who moves a mountain begins by carrying away small stones.", author: "Confucius" },
+  { text: "An investment in knowledge pays the best interest.", author: "Benjamin Franklin" },
+  { text: "You don't rise to the level of your goals. You fall to the level of your systems.", author: "James Clear" },
+  { text: "Wealth is not his that has it, but his that enjoys it.", author: "Benjamin Franklin" },
+  { text: "Don't count the days, make the days count.", author: "Muhammad Ali" },
+  { text: "The secret of getting ahead is getting started.", author: "Mark Twain" },
+  { text: "Success is the sum of small efforts, repeated day in and day out.", author: "Robert Collier" },
+  { text: "The rich invest in time, the poor invest in money.", author: "Warren Buffett" },
+  { text: "Your most important asset is your mind. Invest in it daily.", author: "Robert Kiyosaki" },
+  { text: "If you don't find a way to make money while you sleep, you will work until you die.", author: "Warren Buffett" },
+  { text: "Motivation gets you going, but discipline keeps you growing.", author: "John Maxwell" },
+  { text: "The only way to do great work is to love what you do.", author: "Steve Jobs" },
+  { text: "Code is like humor. When you have to explain it, it's bad.", author: "Cory House" },
+  { text: "First solve the problem, then write the code.", author: "John Johnson" }
+];
+
+let currentQuoteIndex = -1;
+
+function refreshQuote() {
+  let idx;
+  do { idx = Math.floor(Math.random() * quotes.length); } while (idx === currentQuoteIndex);
+  currentQuoteIndex = idx;
+  const q = quotes[idx];
+  const textEl = document.getElementById('quote-text');
+  const authEl = document.getElementById('quote-author');
+  textEl.style.opacity = '0';
+  authEl.style.opacity = '0';
+  setTimeout(() => {
+    textEl.textContent = q.text;
+    authEl.textContent = '— ' + q.author;
+    textEl.style.transition = 'opacity 0.4s';
+    authEl.style.transition = 'opacity 0.4s';
+    textEl.style.opacity = '1';
+    authEl.style.opacity = '1';
+  }, 200);
+}
+
+refreshQuote();
+
+
+/* ============================================
+   DAILY FOCUS TASK
+============================================ */
+function saveFocus() {
+  const val = document.getElementById('focus-task').value;
+  localStorage.setItem('nexus_focus_' + getDateKey(), val);
+}
+
+function loadFocus() {
+  const saved = localStorage.getItem('nexus_focus_' + getDateKey());
+  if (saved) document.getElementById('focus-task').value = saved;
+}
+
+loadFocus();
+
+
+/* ============================================
+   MOOD
+============================================ */
+function setMood(btn, emoji) {
+  document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  localStorage.setItem('nexus_mood_' + getDateKey(), emoji);
+  showToast('Mood saved ' + emoji);
+}
+
+(function loadMood() {
+  const saved = localStorage.getItem('nexus_mood_' + getDateKey());
+  if (saved) {
+    document.querySelectorAll('.mood-btn').forEach(b => {
+      if (b.textContent.trim() === saved) b.classList.add('active');
+    });
+  }
+})();
+
+
+/* ============================================
+   DATE KEY HELPER
+============================================ */
+function getDateKey() {
+  const n = new Date();
+  return `${n.getFullYear()}-${n.getMonth()+1}-${n.getDate()}`;
+}
+
+
+/* ============================================
+   MONTHLY PROGRESS TRACKER
+============================================ */
+let trackerViewDate = new Date();
+let progressData = JSON.parse(localStorage.getItem('nexus_progress') || '{}');
+
+function getDayKey(year, month, day) {
+  return `${year}-${month+1}-${day}`;
+}
+
+function toggleDay(year, month, day) {
+  const now = new Date();
+  // Prevent toggling future dates
+  const clicked = new Date(year, month, day);
+  if (clicked > now) return;
+
+  const key = getDayKey(year, month, day);
+  progressData[key] = !progressData[key];
+  localStorage.setItem('nexus_progress', JSON.stringify(progressData));
+  renderCalendar();
+  renderChart();
+  showToast(progressData[key] ? '✓ Day marked complete!' : 'Day unmarked');
+}
+
+function changeMonth(dir) {
+  trackerViewDate.setMonth(trackerViewDate.getMonth() + dir);
+  renderCalendar();
+}
+
+function renderCalendar() {
+  const year  = trackerViewDate.getFullYear();
+  const month = trackerViewDate.getMonth();
+  const today = new Date();
+
+  const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  document.getElementById('cal-month-title').textContent = `${months[month]} ${year}`;
+
+  const firstDay = new Date(year, month, 1).getDay(); // 0=Sun
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+  let doneCount = 0;
+  let pastCount = 0;
+
+  const grid = document.getElementById('cal-grid');
+  grid.innerHTML = '';
+
+  // Day headers
+  ['Su','Mo','Tu','We','Th','Fr','Sa'].forEach(d => {
+    const h = document.createElement('div');
+    h.className = 'cal-day-name';
+    h.textContent = d;
+    grid.appendChild(h);
+  });
+
+  // Empty cells before first day
+  for (let i = 0; i < firstDay; i++) {
+    const e = document.createElement('div');
+    e.className = 'cal-day empty';
+    grid.appendChild(e);
+  }
+
+  // Day cells
+  for (let d = 1; d <= daysInMonth; d++) {
+    const cell = document.createElement('div');
+    const key  = getDayKey(year, month, d);
+    const thisDate = new Date(year, month, d);
+    const isToday  = today.getDate()===d && today.getMonth()===month && today.getFullYear()===year;
+    const isFuture = thisDate > today;
+
+    cell.textContent = d;
+
+    if (isFuture) {
+      cell.className = 'cal-day future';
+    } else {
+      pastCount++;
+      cell.className = 'cal-day';
+      if (isToday) cell.classList.add('today');
+      if (progressData[key]) { cell.classList.add('done'); doneCount++; }
+      cell.onclick = () => toggleDay(year, month, d);
+    }
+
+    grid.appendChild(cell);
+  }
+
+  // Stats
+  const pct = pastCount > 0 ? Math.round((doneCount / pastCount) * 100) : 0;
+  document.getElementById('stat-pct').textContent = pct + '%';
+
+  // Streak (count backwards from today in same month)
+  let streak = 0;
+  const d2 = new Date(today);
+  while (true) {
+    const k = getDayKey(d2.getFullYear(), d2.getMonth(), d2.getDate());
+    if (progressData[k]) {
+      streak++;
+      d2.setDate(d2.getDate() - 1);
+    } else { break; }
+  }
+  document.getElementById('stat-streak').textContent = streak + (streak===1?' day':' days');
+
+  // Days left in month
+  const lastDay = new Date(year, month + 1, 0).getDate();
+  const daysLeft = Math.max(0, lastDay - today.getDate());
+  document.getElementById('stat-days').textContent = daysLeft;
+}
+
+renderCalendar();
+
+
+/* ============================================
+   CHART.JS — WEEKLY ACTIVITY
+============================================ */
+function getWeeklyData() {
+  const today = new Date();
+  const weeks = [];
+  for (let w = 3; w >= 0; w--) {
+    let count = 0;
+    for (let d = 0; d < 7; d++) {
+      const date = new Date(today);
+      date.setDate(today.getDate() - (w * 7) - (6 - d));
+      const k = getDayKey(date.getFullYear(), date.getMonth(), date.getDate());
+      if (progressData[k]) count++;
+    }
+    weeks.push(count);
+  }
+  return weeks;
+}
+
+function getWeekLabels() {
+  const today = new Date();
+  return ['Week -3','Week -2','Last Wk','This Wk'];
+}
+
+let progressChartInstance = null;
+
+function renderChart() {
+  const ctx = document.getElementById('progressChart').getContext('2d');
+  const data = getWeeklyData();
+
+  if (progressChartInstance) progressChartInstance.destroy();
+
+  progressChartInstance = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: getWeekLabels(),
+      datasets: [{
+        label: 'Days Completed',
+        data: data,
+        backgroundColor: data.map((v, i) =>
+          i === 3 ? 'rgba(0,212,255,0.5)' : 'rgba(139,92,246,0.35)'
+        ),
+        borderColor: data.map((v, i) =>
+          i === 3 ? 'rgba(0,212,255,0.9)' : 'rgba(139,92,246,0.7)'
+        ),
+        borderWidth: 1.5,
+        borderRadius: 6,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false }
+      },
+      scales: {
+        y: {
+          min: 0, max: 7,
+          ticks: { color: 'rgba(240,244,248,0.4)', font: { family: 'JetBrains Mono', size: 10 }, stepSize: 1 },
+          grid: { color: 'rgba(255,255,255,0.05)' },
+          border: { color: 'transparent' }
+        },
+        x: {
+          ticks: { color: 'rgba(240,244,248,0.4)', font: { family: 'JetBrains Mono', size: 10 } },
+          grid: { display: false },
+          border: { color: 'transparent' }
+        }
+      }
+    }
+  });
+}
+
+renderChart();
+
+
+/* ============================================
+   ROADMAP TABS
+============================================ */
+const tabMap = {
+  aiml: 'panel-aiml',
+  exam: 'panel-exam',
+  job:  'panel-job',
+  finance: 'panel-finance'
+};
+
+function switchTab(key) {
+  // Toggle tab buttons
+  document.querySelectorAll('.tab-btn').forEach((btn, i) => {
+    btn.classList.toggle('active', Object.keys(tabMap)[i] === key);
+  });
+  // Show correct panel
+  Object.values(tabMap).forEach(id => {
+    const el = document.getElementById(id);
+    el.classList.toggle('active', id === tabMap[key]);
+  });
+}
+
+
+/* ============================================
+   BALANCE TRACKER
+============================================ */
+(function loadBalance() {
+  const saved = localStorage.getItem('nexus_balance');
+  if (saved) {
+    const num = parseInt(saved);
+    document.getElementById('balance-display').textContent = '₹' + num.toLocaleString('en-IN');
+  }
+})();
+
+function updateBalance() {
+  const val = parseInt(document.getElementById('balance-input').value);
+  if (isNaN(val)) return;
+  localStorage.setItem('nexus_balance', val);
+  document.getElementById('balance-display').textContent = '₹' + val.toLocaleString('en-IN');
+  document.getElementById('balance-input').value = '';
+  showToast('💰 Balance updated!');
+}
+
+
+/* ============================================
+   SKILL TRACKER
+============================================ */
+const skills = [
+  { id: 'python',  name: 'Python',         icon: '🐍', color: '#f59e0b', level: 'Fundamentals Done' },
+  { id: 'dsa',     name: 'DSA',            icon: '🌳', color: '#00d4ff', level: 'Practicing' },
+  { id: 'aiml',    name: 'AI / ML',        icon: '🤖', color: '#8b5cf6', level: 'Learning' },
+  { id: 'dbms',    name: 'DBMS',           icon: '🗄️',  color: '#10d98a', level: 'Exam Ready' },
+  { id: 'os',      name: 'OS',             icon: '⚙️',  color: '#ff4d6d', level: 'Exam Focus' },
+  { id: 'web',     name: 'Web Dev',        icon: '🌐', color: '#00d4ff', level: 'Exploring' },
+  { id: 'github',  name: 'GitHub',         icon: '🐙', color: '#8b5cf6', level: 'Active' },
+  { id: 'maths',   name: 'Math for ML',    icon: '📐', color: '#f59e0b', level: 'Graph Theory Done' }
+];
+
+let skillData = JSON.parse(localStorage.getItem('nexus_skills') || '{}');
+
+// Initialize defaults
+skills.forEach(s => {
+  if (skillData[s.id] === undefined) skillData[s.id] = 25;
+});
+
+function saveSkills() {
+  localStorage.setItem('nexus_skills', JSON.stringify(skillData));
+}
+
+function changeSkill(id, delta) {
+  skillData[id] = Math.max(0, Math.min(100, skillData[id] + delta));
+  saveSkills();
+  renderSkills();
+}
+
+function renderSkills() {
+  const grid = document.getElementById('skill-grid');
+  grid.innerHTML = '';
+
+  skills.forEach(s => {
+    const pct = skillData[s.id];
+    const card = document.createElement('div');
+    card.className = 'glass skill-card';
+    card.style.borderColor = pct >= 70 ? `${s.color}40` : 'var(--border)';
+    card.innerHTML = `
+      <div class="skill-icon">${s.icon}</div>
+      <div class="skill-name" style="color:${s.color}">${s.name}</div>
+      <div class="skill-level">${s.level}</div>
+      <div class="progress-bar-wrap">
+        <div class="progress-bar-fill" style="width:${pct}%;background:linear-gradient(90deg,${s.color}88,${s.color})"></div>
+      </div>
+      <div class="skill-pct">${pct}% proficiency</div>
+      <div class="skill-controls">
+        <button class="skill-btn" onclick="changeSkill('${s.id}', -5)" title="Decrease">−</button>
+        <button class="skill-btn" onclick="changeSkill('${s.id}', 5)"  title="Increase">+</button>
+        <button class="skill-btn" onclick="changeSkill('${s.id}', 10)" title="+10" style="font-size:0.65rem;width:auto;padding:0 8px;">+10</button>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+renderSkills();
+
+
+/* ============================================
+   NOTES
+============================================ */
+let notes = JSON.parse(localStorage.getItem('nexus_notes') || '[]');
+let editingNoteId = null;
+
+document.getElementById('note-body').addEventListener('input', function() {
+  document.getElementById('note-char-count').textContent = this.value.length + ' chars';
+});
+
+function saveNote() {
+  const title = document.getElementById('note-title').value.trim() || 'Untitled';
+  const body  = document.getElementById('note-body').value.trim();
+  if (!body) { showToast('Write something first!'); return; }
+
+  if (editingNoteId !== null) {
+    const idx = notes.findIndex(n => n.id === editingNoteId);
+    if (idx !== -1) {
+      notes[idx] = { ...notes[idx], title, body, updated: new Date().toISOString() };
+    }
+    editingNoteId = null;
+  } else {
+    notes.unshift({
+      id: Date.now(),
+      title,
+      body,
+      created: new Date().toISOString(),
+      updated: new Date().toISOString()
+    });
+  }
+
+  localStorage.setItem('nexus_notes', JSON.stringify(notes));
+  clearNoteEditor();
+  renderNotes();
+  showToast('📝 Note saved!');
+}
+
+function clearNoteEditor() {
+  document.getElementById('note-title').value = '';
+  document.getElementById('note-body').value = '';
+  document.getElementById('note-char-count').textContent = '0 chars';
+  editingNoteId = null;
+}
+
+function deleteNote(id) {
+  notes = notes.filter(n => n.id !== id);
+  localStorage.setItem('nexus_notes', JSON.stringify(notes));
+  if (editingNoteId === id) clearNoteEditor();
+  renderNotes();
+  showToast('Note deleted');
+}
+
+function loadNoteIntoEditor(id) {
+  const note = notes.find(n => n.id === id);
+  if (!note) return;
+  document.getElementById('note-title').value = note.title;
+  document.getElementById('note-body').value = note.body;
+  document.getElementById('note-char-count').textContent = note.body.length + ' chars';
+  editingNoteId = id;
+  document.querySelector('#notes').scrollIntoView({ behavior: 'smooth' });
+}
+
+function renderNotes() {
+  const list = document.getElementById('notes-list');
+  document.getElementById('note-count').textContent = notes.length;
+
+  if (notes.length === 0) {
+    list.innerHTML = '<div style="color:var(--dim);font-size:0.8rem;text-align:center;padding:20px 0;">No notes yet. Start writing!</div>';
+    return;
+  }
+
+  list.innerHTML = notes.map(n => {
+    const date = new Date(n.updated).toLocaleDateString('en-IN', { day:'numeric', month:'short' });
+    return `
+      <div class="note-item" onclick="loadNoteIntoEditor(${n.id})">
+        <button class="note-delete" onclick="event.stopPropagation();deleteNote(${n.id})" title="Delete">✕</button>
+        <div class="note-item-title">${escapeHtml(n.title)}</div>
+        <div class="note-item-preview">${escapeHtml(n.body.substring(0, 60))}${n.body.length > 60 ? '…' : ''}</div>
+        <div class="note-item-date">${date}</div>
+      </div>
+    `;
+  }).join('');
+}
+
+function escapeHtml(text) {
+  return text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+renderNotes();
+
+</script>
+</body>
+</html>
