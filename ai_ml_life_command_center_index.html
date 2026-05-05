@@ -1,0 +1,1607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI/ML Life Guide & Financial Freedom System</title>
+  <style>
+    /* =========================
+       AI/ML Life Command Center
+       Single-file HTML + CSS + JS
+       ========================= */
+
+    :root {
+      --bg: #05070f;
+      --bg-soft: #0a1020;
+      --card: rgba(255, 255, 255, 0.075);
+      --card-strong: rgba(255, 255, 255, 0.12);
+      --border: rgba(255, 255, 255, 0.14);
+      --text: #f7f8ff;
+      --muted: #aab4d4;
+      --muted-2: #7682a7;
+      --cyan: #5ee7ff;
+      --blue: #7c5cff;
+      --pink: #ff5ecf;
+      --green: #7cffb2;
+      --yellow: #ffe27c;
+      --danger: #ff6b8a;
+      --radius-xl: 28px;
+      --radius-lg: 22px;
+      --radius-md: 16px;
+      --shadow: 0 24px 80px rgba(0, 0, 0, 0.38);
+      --glow: 0 0 28px rgba(94, 231, 255, 0.22);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      min-height: 100vh;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 10% 10%, rgba(124, 92, 255, 0.28), transparent 34%),
+        radial-gradient(circle at 90% 0%, rgba(94, 231, 255, 0.22), transparent 28%),
+        radial-gradient(circle at 50% 100%, rgba(255, 94, 207, 0.16), transparent 34%),
+        linear-gradient(135deg, #04050b 0%, #091021 45%, #05070f 100%);
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.032) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.032) 1px, transparent 1px);
+      background-size: 44px 44px;
+      mask-image: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent 85%);
+      z-index: -2;
+    }
+
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.45) 100%);
+      z-index: -1;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button,
+    input,
+    textarea {
+      font: inherit;
+    }
+
+    .container {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    .nav {
+      position: sticky;
+      top: 12px;
+      z-index: 100;
+      margin: 12px auto 0;
+      width: min(1180px, calc(100% - 24px));
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 12px 14px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: rgba(6, 10, 22, 0.72);
+      backdrop-filter: blur(22px);
+      box-shadow: 0 16px 40px rgba(0,0,0,0.25);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      white-space: nowrap;
+    }
+
+    .brand-icon {
+      width: 36px;
+      height: 36px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--cyan), var(--blue), var(--pink));
+      box-shadow: var(--glow);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .nav-links a {
+      color: var(--muted);
+      font-size: 0.84rem;
+      padding: 9px 12px;
+      border-radius: 999px;
+      transition: 0.25s ease;
+    }
+
+    .nav-links a:hover {
+      color: var(--text);
+      background: rgba(255,255,255,0.09);
+    }
+
+    .hero {
+      min-height: 86vh;
+      display: grid;
+      align-items: center;
+      padding: 86px 0 64px;
+      position: relative;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 32px;
+      align-items: center;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: rgba(255,255,255,0.07);
+      color: var(--muted);
+      font-size: 0.88rem;
+      margin-bottom: 18px;
+    }
+
+    .hero h1 {
+      font-size: clamp(2.65rem, 7vw, 6.7rem);
+      line-height: 0.92;
+      letter-spacing: -0.08em;
+      max-width: 880px;
+    }
+
+    .gradient-text {
+      background: linear-gradient(90deg, #fff, var(--cyan), var(--blue), var(--pink));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .hero p {
+      margin-top: 22px;
+      color: var(--muted);
+      font-size: clamp(1rem, 2vw, 1.25rem);
+      line-height: 1.7;
+      max-width: 720px;
+    }
+
+    .quote {
+      margin-top: 24px;
+      padding: 18px 20px;
+      border-left: 4px solid var(--cyan);
+      background: rgba(255,255,255,0.07);
+      border-radius: 0 var(--radius-md) var(--radius-md) 0;
+      color: #e9edff;
+      max-width: 690px;
+    }
+
+    .hero-actions {
+      margin-top: 28px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .btn {
+      border: 0;
+      cursor: pointer;
+      padding: 13px 18px;
+      border-radius: 999px;
+      color: var(--text);
+      background: rgba(255,255,255,0.09);
+      border: 1px solid var(--border);
+      transition: 0.25s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--cyan), var(--blue));
+      color: #04101e;
+      font-weight: 800;
+      box-shadow: var(--glow);
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.08);
+    }
+
+    .command-card {
+      position: relative;
+      border: 1px solid var(--border);
+      border-radius: 34px;
+      background: linear-gradient(145deg, rgba(255,255,255,0.16), rgba(255,255,255,0.055));
+      backdrop-filter: blur(28px);
+      box-shadow: var(--shadow);
+      padding: 22px;
+      overflow: hidden;
+      animation: float 6s ease-in-out infinite;
+    }
+
+    .command-card::before {
+      content: "";
+      position: absolute;
+      width: 260px;
+      height: 260px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(94,231,255,0.28), transparent 65%);
+      right: -80px;
+      top: -80px;
+    }
+
+    .mini-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 18px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .traffic {
+      display: flex;
+      gap: 7px;
+    }
+
+    .dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      background: var(--danger);
+    }
+
+    .dot:nth-child(2) { background: var(--yellow); }
+    .dot:nth-child(3) { background: var(--green); }
+
+    .status-pill {
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: rgba(124, 255, 178, 0.12);
+      color: var(--green);
+      font-size: 0.78rem;
+      border: 1px solid rgba(124, 255, 178, 0.25);
+    }
+
+    .dashboard-stack {
+      display: grid;
+      gap: 14px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .dash-item {
+      padding: 16px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(7,12,28,0.62);
+      border-radius: var(--radius-lg);
+    }
+
+    .dash-item strong {
+      display: block;
+      font-size: 1.8rem;
+      margin-bottom: 4px;
+      letter-spacing: -0.04em;
+    }
+
+    .dash-item span {
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .section {
+      padding: 72px 0;
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 24px;
+      margin-bottom: 26px;
+    }
+
+    .section-kicker {
+      color: var(--cyan);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      font-size: 0.78rem;
+      margin-bottom: 9px;
+    }
+
+    .section h2 {
+      font-size: clamp(2rem, 4vw, 3.3rem);
+      letter-spacing: -0.065em;
+      line-height: 1;
+    }
+
+    .section-desc {
+      color: var(--muted);
+      max-width: 560px;
+      line-height: 1.7;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+
+    .card {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      background: var(--card);
+      backdrop-filter: blur(22px);
+      box-shadow: 0 16px 50px rgba(0,0,0,0.18);
+      padding: 22px;
+      transition: 0.25s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::after {
+      content: "";
+      position: absolute;
+      inset: auto -30% -50% auto;
+      width: 220px;
+      height: 220px;
+      background: radial-gradient(circle, rgba(124,92,255,0.16), transparent 70%);
+      pointer-events: none;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      border-color: rgba(94,231,255,0.32);
+      background: var(--card-strong);
+    }
+
+    .card-icon {
+      width: 44px;
+      height: 44px;
+      display: grid;
+      place-items: center;
+      border-radius: 15px;
+      background: linear-gradient(135deg, rgba(94,231,255,0.18), rgba(124,92,255,0.18));
+      border: 1px solid rgba(255,255,255,0.12);
+      margin-bottom: 16px;
+      font-size: 1.25rem;
+    }
+
+    .card h3 {
+      font-size: 1.16rem;
+      margin-bottom: 9px;
+      letter-spacing: -0.03em;
+    }
+
+    .card p,
+    .card li {
+      color: var(--muted);
+      line-height: 1.6;
+      font-size: 0.95rem;
+    }
+
+    .card ul {
+      padding-left: 18px;
+      margin-top: 10px;
+    }
+
+    .checklist {
+      display: grid;
+      gap: 12px;
+    }
+
+    .task {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 15px;
+      border-radius: var(--radius-md);
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+      cursor: pointer;
+      transition: 0.22s ease;
+    }
+
+    .task:hover {
+      background: rgba(255,255,255,0.1);
+    }
+
+    .task input {
+      width: 19px;
+      height: 19px;
+      accent-color: var(--cyan);
+    }
+
+    .task span {
+      color: var(--muted);
+    }
+
+    .task.done span {
+      color: var(--text);
+      text-decoration: line-through;
+      text-decoration-color: var(--cyan);
+    }
+
+    .progress-wrap {
+      margin: 18px 0;
+    }
+
+    .progress-label {
+      display: flex;
+      justify-content: space-between;
+      color: var(--muted);
+      margin-bottom: 8px;
+      font-size: 0.9rem;
+    }
+
+    .progress-bg {
+      width: 100%;
+      height: 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.09);
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .progress-fill {
+      width: 0%;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--cyan), var(--blue), var(--pink));
+      transition: width 0.35s ease;
+    }
+
+    .date-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 14px;
+      padding: 9px 12px;
+      border-radius: 999px;
+      color: var(--muted);
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.1);
+      font-size: 0.88rem;
+    }
+
+    .chart-card {
+      min-height: 100%;
+    }
+
+    .chart-summary {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin: 18px 0;
+    }
+
+    .mini-metric {
+      padding: 13px;
+      border-radius: var(--radius-md);
+      background: rgba(255,255,255,0.065);
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .mini-metric span {
+      display: block;
+      color: var(--muted);
+      font-size: 0.78rem;
+      margin-bottom: 6px;
+    }
+
+    .mini-metric strong {
+      font-size: 1.25rem;
+      letter-spacing: -0.04em;
+    }
+
+    .month-chart {
+      height: 260px;
+      display: flex;
+      align-items: end;
+      gap: 7px;
+      padding: 18px 12px 12px;
+      border-radius: var(--radius-xl);
+      background:
+        linear-gradient(rgba(255,255,255,0.045) 1px, transparent 1px),
+        rgba(0,0,0,0.16);
+      background-size: 100% 25%;
+      border: 1px solid rgba(255,255,255,0.1);
+      overflow-x: auto;
+    }
+
+    .chart-bar-wrap {
+      min-width: 24px;
+      flex: 1;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: end;
+      gap: 7px;
+    }
+
+    .chart-bar {
+      width: 100%;
+      min-height: 4px;
+      border-radius: 999px 999px 6px 6px;
+      background: linear-gradient(180deg, var(--cyan), var(--blue), var(--pink));
+      box-shadow: 0 0 18px rgba(94,231,255,0.18);
+      opacity: 0.92;
+      transition: 0.25s ease;
+    }
+
+    .chart-bar.empty {
+      background: rgba(255,255,255,0.12);
+      box-shadow: none;
+      opacity: 0.55;
+    }
+
+    .chart-bar.today {
+      outline: 2px solid rgba(255,255,255,0.55);
+      outline-offset: 3px;
+    }
+
+    .chart-day {
+      color: var(--muted-2);
+      font-size: 0.68rem;
+    }
+
+    .chart-note {
+      color: var(--muted);
+      font-size: 0.88rem;
+      line-height: 1.6;
+      margin-top: 14px;
+    }
+
+    .routine-grid {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(150px, 1fr));
+      gap: 12px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+    }
+
+    .day-card {
+      min-width: 150px;
+      padding: 18px;
+      border-radius: var(--radius-lg);
+      background: rgba(255,255,255,0.065);
+      border: 1px solid rgba(255,255,255,0.11);
+    }
+
+    .day-card strong {
+      display: block;
+      margin-bottom: 10px;
+      color: var(--cyan);
+    }
+
+    .day-card span {
+      color: var(--muted);
+      line-height: 1.55;
+      font-size: 0.92rem;
+    }
+
+    .timeline {
+      position: relative;
+      display: grid;
+      gap: 16px;
+    }
+
+    .timeline::before {
+      content: "";
+      position: absolute;
+      left: 22px;
+      top: 10px;
+      bottom: 10px;
+      width: 2px;
+      background: linear-gradient(var(--cyan), var(--blue), var(--pink));
+      opacity: 0.55;
+    }
+
+    .level {
+      display: grid;
+      grid-template-columns: 48px 1fr;
+      gap: 16px;
+      align-items: start;
+    }
+
+    .level-number {
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, var(--cyan), var(--blue));
+      color: #04101e;
+      font-weight: 900;
+      position: relative;
+      z-index: 1;
+      box-shadow: var(--glow);
+    }
+
+    .tag-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 12px 0;
+    }
+
+    .tag {
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: var(--muted);
+      font-size: 0.82rem;
+    }
+
+    .input-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .field {
+      display: grid;
+      gap: 7px;
+    }
+
+    label {
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+
+    input,
+    textarea {
+      width: 100%;
+      color: var(--text);
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.13);
+      outline: none;
+      border-radius: var(--radius-md);
+      padding: 13px 14px;
+      transition: 0.2s ease;
+    }
+
+    input:focus,
+    textarea:focus {
+      border-color: rgba(94,231,255,0.55);
+      box-shadow: 0 0 0 4px rgba(94,231,255,0.08);
+    }
+
+    textarea {
+      min-height: 105px;
+      resize: vertical;
+    }
+
+    .money-result {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .metric {
+      padding: 16px;
+      border-radius: var(--radius-lg);
+      background: rgba(0,0,0,0.18);
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .metric span {
+      color: var(--muted);
+      font-size: 0.84rem;
+    }
+
+    .metric strong {
+      display: block;
+      font-size: 1.55rem;
+      margin-top: 6px;
+      letter-spacing: -0.04em;
+    }
+
+    .emergency {
+      border-color: rgba(255, 226, 124, 0.28);
+      background: linear-gradient(135deg, rgba(255,226,124,0.13), rgba(255,255,255,0.055));
+    }
+
+    .meal-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    .review-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+    }
+
+    .prompt-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+
+    .prompt-card {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .copy-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.08);
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+
+    .copy-btn {
+      border: 0;
+      border-radius: 999px;
+      padding: 7px 9px;
+      cursor: pointer;
+      color: var(--text);
+      background: rgba(94,231,255,0.15);
+      border: 1px solid rgba(94,231,255,0.2);
+    }
+
+    .month-plan {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(170px, 1fr));
+      gap: 12px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+    }
+
+    footer {
+      padding: 42px 0 54px;
+      text-align: center;
+      color: var(--muted);
+    }
+
+    footer strong {
+      display: block;
+      color: var(--text);
+      font-size: clamp(1.7rem, 4vw, 3rem);
+      letter-spacing: -0.06em;
+      margin-bottom: 10px;
+    }
+
+    .fade-in {
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeIn 0.85s ease forwards;
+    }
+
+    @keyframes fadeIn {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-12px); }
+    }
+
+    @media (max-width: 980px) {
+      .hero-grid,
+      .grid,
+      .grid-2,
+      .input-grid,
+      .review-grid,
+      .prompt-grid,
+      .meal-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .hero-grid {
+        gap: 26px;
+      }
+
+      .nav {
+        align-items: flex-start;
+        border-radius: 24px;
+        flex-direction: column;
+      }
+
+      .nav-links {
+        justify-content: flex-start;
+      }
+    }
+
+    @media (max-width: 680px) {
+      .container {
+        width: min(100% - 22px, 1180px);
+      }
+
+      .hero {
+        min-height: auto;
+        padding-top: 48px;
+      }
+
+      .hero-grid,
+      .grid,
+      .grid-2,
+      .input-grid,
+      .review-grid,
+      .prompt-grid,
+      .meal-grid,
+      .money-result {
+        grid-template-columns: 1fr;
+      }
+
+      .section-header {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .nav-links a {
+        font-size: 0.78rem;
+        padding: 8px 9px;
+      }
+
+      .hero h1 {
+        font-size: 3.25rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav class="nav">
+    <a class="brand" href="#hero">
+      <span class="brand-icon">✦</span>
+      <span>Life OS</span>
+    </a>
+    <div class="nav-links">
+      <a href="#today">Today</a>
+      <a href="#roadmap">Roadmap</a>
+      <a href="#projects">Projects</a>
+      <a href="#money">Money</a>
+      <a href="#review">Review</a>
+    </div>
+  </nav>
+
+  <header class="hero" id="hero">
+    <div class="container hero-grid">
+      <div class="fade-in">
+        <div class="eyebrow">⌁ Personal AI command center</div>
+        <h1>AI/ML Life Guide & <span class="gradient-text">Financial Freedom System</span></h1>
+        <p>A complete personal roadmap to move from confusion, laziness, and distraction to skill, income, discipline, and freedom.</p>
+        <div class="quote">“I don’t need to be perfect. I only need to improve a little every day.”</div>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="#today">Start Today</a>
+          <a class="btn" href="#roadmap">View Roadmap</a>
+          <a class="btn" href="#tracker">Open Tracker</a>
+        </div>
+      </div>
+
+      <aside class="command-card fade-in" style="animation-delay: .15s;">
+        <div class="mini-top">
+          <div class="traffic"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+          <div class="status-pill">System Online</div>
+        </div>
+        <div class="dashboard-stack">
+          <div class="dash-item">
+            <strong id="heroProgress">0%</strong>
+            <span>Daily execution score</span>
+          </div>
+          <div class="dash-item">
+            <strong>6 Months</strong>
+            <span>From scattered learning to focused portfolio</span>
+          </div>
+          <div class="dash-item">
+            <strong>AI + Hardware</strong>
+            <span>Your unique advantage: software mind + practical electronics</span>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </header>
+
+  <main>
+    <section class="section" id="profile">
+      <div class="container">
+        <div class="section-header">
+          <div>
+            <div class="section-kicker">Current Situation</div>
+            <h2>Your starting point is not weak. It is raw material.</h2>
+          </div>
+          <p class="section-desc">This dashboard is built around your real situation: AI/ML student, hardware diploma background, big goals, and the need for a simple daily system.</p>
+        </div>
+
+        <div class="grid">
+          <div class="card"><div class="card-icon">🎓</div><h3>B.Tech CSE AI & ML</h3><p>College learning gives you structure. Your job is to convert it into projects, proof, and confidence.</p></div>
+          <div class="card"><div class="card-icon">🛠</div><h3>Hardware Diploma</h3><p>Your hardware background can become a rare advantage when mixed with AI, IoT, robotics, and automation.</p></div>
+          <div class="card"><div class="card-icon">🧠</div><h3>Interests</h3><p>AI, ML, robotics, automation, PC hardware, finance, smart farming, and side income ideas.</p></div>
+          <div class="card"><div class="card-icon">⚡</div><h3>Strengths</h3><p>Curiosity, practical thinking, value-for-money mindset, hardware + AI combination, and willingness to improve.</p></div>
+          <div class="card"><div class="card-icon">🌀</div><h3>Weaknesses</h3><p>Procrastination, distraction, laziness, confusion, overthinking, and inconsistent routine.</p></div>
+          <div class="card"><div class="card-icon">💎</div><h3>Main Goal</h3><p>Financial freedom through skills, discipline, income-building, and smart money management.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="today">
+      <div class="container grid-2">
+        <div class="card" id="tracker">
+          <div class="section-kicker">Daily Minimum System</div>
+          <h2>Win today, even if life feels messy.</h2>
+          <p class="section-desc">Complete at least 3 tasks. A small win is better than a perfect plan you never follow.</p>
+
+          <div class="date-pill">📅 <span id="todayDate">Today</span></div>
+
+          <div class="progress-wrap">
+            <div class="progress-label"><span>Daily Progress</span><strong id="progressText">0%</strong></div>
+            <div class="progress-bg"><div class="progress-fill" id="progressFill"></div></div>
+          </div>
+
+          <div class="checklist" id="dailyChecklist"></div>
+          <button class="btn" style="margin-top: 16px;" id="resetToday">Reset Today</button>
+        </div>
+
+        <div class="card chart-card">
+          <div class="section-kicker">Monthly Progress Graph</div>
+          <h2>This month’s execution.</h2>
+          <p class="section-desc">Every time you tick today’s tasks, the daily percentage is saved automatically for the current date.</p>
+
+          <div class="chart-summary">
+            <div class="mini-metric"><span>Today</span><strong id="chartToday">0%</strong></div>
+            <div class="mini-metric"><span>Best Day</span><strong id="chartBest">0%</strong></div>
+            <div class="mini-metric"><span>Average</span><strong id="chartAverage">0%</strong></div>
+          </div>
+
+          <div class="month-chart" id="monthChart"></div>
+          <p class="chart-note">Tip: Open this page daily and tick your tasks. The graph becomes your personal discipline history.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="emergency">
+      <div class="container">
+        <div class="card emergency">
+          <div class="section-kicker">Emergency Mode</div>
+          <h2>When I feel lazy</h2>
+          <ul>
+            <li>Drink water.</li>
+            <li>Clean table.</li>
+            <li>Start only 5 minutes.</li>
+            <li>Do one small task.</li>
+            <li>Mark tracker.</li>
+          </ul>
+          <div class="quote" style="margin-top: 20px;">Action first. Motivation comes after movement.</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="routine">
+      <div class="container">
+        <div class="section-header">
+          <div><div class="section-kicker">Weekly Routine</div><h2>A simple rhythm for skill, college, and health.</h2></div>
+        </div>
+        <div class="routine-grid">
+          <div class="day-card"><strong>Monday</strong><span>Python + College subject + Walking</span></div>
+          <div class="day-card"><strong>Tuesday</strong><span>SQL + Data Structures + English practice</span></div>
+          <div class="day-card"><strong>Wednesday</strong><span>Machine Learning basics + Project work</span></div>
+          <div class="day-card"><strong>Thursday</strong><span>AI tools / automation + OS/DBMS revision</span></div>
+          <div class="day-card"><strong>Friday</strong><span>Hardware/IoT learning + GitHub update</span></div>
+          <div class="day-card"><strong>Saturday</strong><span>Portfolio project + Resume/LinkedIn improvement</span></div>
+          <div class="day-card"><strong>Sunday</strong><span>Weekly review + Rest + Planning next week</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="roadmap">
+      <div class="container">
+        <div class="section-header">
+          <div><div class="section-kicker">AI/ML Roadmap</div><h2>From beginner foundations to AI + hardware advantage.</h2></div>
+          <p class="section-desc">Do not jump randomly. Move level by level and create proof using small projects.</p>
+        </div>
+
+        <div class="timeline" id="roadmapList"></div>
+      </div>
+    </section>
+
+    <section class="section" id="projects">
+      <div class="container">
+        <div class="section-header">
+          <div><div class="section-kicker">Portfolio Projects</div><h2>Projects that prove you can build.</h2></div>
+        </div>
+        <div class="grid" id="projectGrid"></div>
+      </div>
+    </section>
+
+    <section class="section" id="money">
+      <div class="container grid-2">
+        <div class="card">
+          <div class="section-kicker">Money Rules</div>
+          <h2>Financial freedom starts with control.</h2>
+          <ul>
+            <li>Track every rupee.</li>
+            <li>Save before spending.</li>
+            <li>Avoid useless purchases.</li>
+            <li>Build emergency fund.</li>
+            <li>Learn SIP and mutual funds.</li>
+            <li>Buy value-for-money things.</li>
+            <li>Build income skills first.</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <div class="section-kicker">Mini Financial Tracker</div>
+          <h2>Monthly Money Dashboard</h2>
+          <div class="input-grid" style="margin-top: 16px;">
+            <div class="field"><label>Monthly income</label><input type="number" id="income" placeholder="₹0"></div>
+            <div class="field"><label>Monthly expense</label><input type="number" id="expense" placeholder="₹0"></div>
+            <div class="field"><label>Investment</label><input type="number" id="investment" placeholder="₹0"></div>
+            <div class="field"><label>Notes</label><input type="text" id="moneyNotes" placeholder="Example: avoid impulse buying"></div>
+          </div>
+          <div class="money-result">
+            <div class="metric"><span>Savings</span><strong id="savingsValue">₹0</strong></div>
+            <div class="metric"><span>Savings %</span><strong id="savingsPercent">0%</strong></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="habits">
+      <div class="container">
+        <div class="section-header">
+          <div><div class="section-kicker">Habit & Distraction Control</div><h2>Reduce friction. Increase action.</h2></div>
+        </div>
+        <div class="grid-2">
+          <div class="card"><div class="card-icon">📵</div><h3>Problems</h3><ul><li>Phone addiction</li><li>YouTube distraction</li><li>Procrastination</li><li>Overthinking</li><li>Loneliness</li><li>Bad habits</li></ul></div>
+          <div class="card"><div class="card-icon">✅</div><h3>Solutions</h3><ul><li>5-minute start rule</li><li>Keep phone away during study</li><li>Use YouTube only for learning blocks</li><li>Write the next small action</li><li>Join useful communities</li><li>Avoid being alone with phone at night</li><li>Replace bad habits slowly</li></ul></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="health">
+      <div class="container">
+        <div class="section-header">
+          <div><div class="section-kicker">Food & Health</div><h2>Basic body care for better focus.</h2></div>
+        </div>
+        <div class="grid">
+          <div class="card"><div class="card-icon">💧</div><h3>Daily Basics</h3><p>Drink water, walk or stretch daily, get sunlight, sleep better, reduce junk food and sugar drinks.</p></div>
+          <div class="card"><div class="card-icon">🍳</div><h3>Protein</h3><p>Egg, dal, chana, fish, chicken, paneer, curd, milk, and affordable local options.</p></div>
+          <div class="card"><div class="card-icon">🥦</div><h3>Micronutrients</h3><p>Add vegetables and fruits when possible. Small consistent nutrition beats random expensive diets.</p></div>
+        </div>
+        <div class="meal-grid" style="margin-top: 14px;">
+          <div class="card"><h3>Breakfast</h3><p>Oats / ragi / egg / banana / milk.</p></div>
+          <div class="card"><h3>Lunch</h3><p>Rice + dal/fish/chicken + vegetables.</p></div>
+          <div class="card"><h3>Evening Snack</h3><p>Curd, seeds, chana, fruit, or tea with light snack.</p></div>
+          <div class="card"><h3>Dinner</h3><p>Simple rice/chapati + protein + vegetables.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="english">
+      <div class="container grid-2">
+        <div class="card">
+          <div class="section-kicker">English Improvement</div>
+          <h2>Daily 20-minute English routine.</h2>
+          <ul>
+            <li>Read simple news for 10 minutes.</li>
+            <li>Write summary in your own words.</li>
+            <li>Speak it aloud.</li>
+            <li>Learn 5 new words.</li>
+            <li>Record voice once a week.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="field">
+            <label>Today’s English practice</label>
+            <textarea id="englishPractice" placeholder="Write a small paragraph here..."></textarea>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="review">
+      <div class="container">
+        <div class="section-header">
+          <div><div class="section-kicker">Weekly Review</div><h2>Review your system, not your self-worth.</h2></div>
+          <button class="btn" id="clearReview">Clear Review</button>
+        </div>
+        <div class="review-grid" id="reviewGrid"></div>
+      </div>
+    </section>
+
+    <section class="section" id="search">
+      <div class="container">
+        <div class="section-header">
+          <div><div class="section-kicker">Search Topics</div><h2>Copyable prompts for learning.</h2></div>
+        </div>
+        <div class="prompt-grid" id="promptGrid"></div>
+      </div>
+    </section>
+
+    <section class="section" id="plan">
+      <div class="container">
+        <div class="section-header">
+          <div><div class="section-kicker">6-Month Master Plan</div><h2>Six months of focused compounding.</h2></div>
+        </div>
+        <div class="month-plan" id="monthPlan"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      <strong>Small daily improvement creates big life change.</strong>
+      <p>Built as your personal command center for discipline, skills, money, and freedom.</p>
+    </div>
+  </footer>
+
+  <script>
+    // =========================
+    // Data
+    // =========================
+
+    const dailyTasks = [
+      "Study college subject for 30 minutes",
+      "Learn career skill for 30 minutes",
+      "Practice coding / AI / project for 30 minutes",
+      "Move body for 10 minutes",
+      "Avoid wasting the whole day",
+      "Review the day at night"
+    ];
+
+    const roadmap = [
+      {
+        title: "Python Foundation",
+        topics: ["Variables", "Loops", "Functions", "Lists", "Dictionaries", "File handling"],
+        goal: "Write simple programs without fear.",
+        project: "Build a student marks calculator."
+      },
+      {
+        title: "Data Skills",
+        topics: ["NumPy", "Pandas", "Matplotlib", "Excel basics", "SQL"],
+        goal: "Clean, analyze, and visualize data.",
+        project: "Analyze monthly expenses and show charts."
+      },
+      {
+        title: "Machine Learning",
+        topics: ["Regression", "Classification", "Clustering", "Train-test split", "Accuracy", "Overfitting"],
+        goal: "Train and evaluate beginner ML models.",
+        project: "Student performance predictor."
+      },
+      {
+        title: "Deep Learning",
+        topics: ["Neural networks", "CNN", "PyTorch", "TensorFlow basics"],
+        goal: "Understand how neural networks learn patterns.",
+        project: "Image classifier for simple categories."
+      },
+      {
+        title: "AI Automation",
+        topics: ["Prompt engineering", "APIs", "Chatbots", "Document Q&A", "AI agents basics"],
+        goal: "Use AI tools to automate useful tasks.",
+        project: "College FAQ chatbot using documents."
+      },
+      {
+        title: "AI + Hardware Advantage",
+        topics: ["Arduino", "Raspberry Pi", "Sensors", "Computer vision", "Smart farming", "Robotics"],
+        goal: "Mix AI with real-world devices.",
+        project: "Smart incubator or farming dashboard."
+      }
+    ];
+
+    const projects = [
+      ["Personal Finance Tracker", "Python + SQL + Charts", "Track income, expenses, savings, and investments."],
+      ["Student Performance Predictor", "Python + ML", "Predict student result or performance."],
+      ["AI College FAQ Chatbot", "Python + AI API", "Answer questions using college documents."],
+      ["PC Troubleshooting Assistant", "Python + AI", "Use hardware knowledge to diagnose PC problems."],
+      ["Smart Incubator Monitor", "Arduino/Raspberry Pi + Sensors", "Monitor temperature and humidity for eggs."],
+      ["Smart Farming Dashboard", "IoT + Web dashboard", "Track soil moisture, temperature, and humidity."]
+    ];
+
+    const reviewQuestions = [
+      "What did I study this week?",
+      "What skill did I improve?",
+      "What distracted me?",
+      "What should I fix next week?",
+      "What project did I touch?",
+      "Did I waste money?",
+      "Did I exercise?",
+      "What is next week’s top priority?"
+    ];
+
+    const searchGroups = {
+      "AI/ML": [
+        "Python roadmap for AI ML beginner",
+        "Machine learning roadmap beginner",
+        "Best AI ML projects for students",
+        "AI automation projects for beginners"
+      ],
+      "Career": [
+        "AI ML jobs for freshers India skills required",
+        "Data analyst fresher skills India",
+        "AI automation freelancing skills",
+        "Internship roadmap for AI ML students"
+      ],
+      "Hardware + AI": [
+        "AI IoT projects for engineering students",
+        "Raspberry Pi AI camera projects",
+        "Arduino smart farming projects",
+        "Computer vision projects for beginners"
+      ],
+      "Money": [
+        "Personal finance for students India",
+        "SIP basics India",
+        "Emergency fund meaning India",
+        "How to save money as a college student"
+      ],
+      "Discipline": [
+        "How to stop procrastination for students",
+        "Atomic Habits practical summary",
+        "How to build discipline when lazy"
+      ]
+    };
+
+    const months = [
+      ["Month 1", "Python basics, SQL basics, daily routine, one small project."],
+      ["Month 2", "Pandas, NumPy, data analysis, GitHub, English improvement."],
+      ["Month 3", "Machine learning basics, two ML projects, resume building."],
+      ["Month 4", "AI automation, chatbot/document Q&A project, LinkedIn/GitHub posting."],
+      ["Month 5", "Hardware + AI/IoT project, internship applications, freelance service ideas."],
+      ["Month 6", "Strong portfolio, apply for internships, build one serious project."]
+    ];
+
+    // =========================
+    // Helpers
+    // =========================
+
+    function save(key, value) {
+      localStorage.setItem(key, JSON.stringify(value));
+    }
+
+    function load(key, fallback) {
+      try {
+        const value = localStorage.getItem(key);
+        return value ? JSON.parse(value) : fallback;
+      } catch {
+        return fallback;
+      }
+    }
+
+    // =========================
+    // Daily Checklist
+    // =========================
+
+    const checklistEl = document.getElementById("dailyChecklist");
+    const progressFill = document.getElementById("progressFill");
+    const progressText = document.getElementById("progressText");
+    const heroProgress = document.getElementById("heroProgress");
+    const todayDate = document.getElementById("todayDate");
+    const monthChart = document.getElementById("monthChart");
+    const chartToday = document.getElementById("chartToday");
+    const chartBest = document.getElementById("chartBest");
+    const chartAverage = document.getElementById("chartAverage");
+
+    const now = new Date();
+    const todayKey = getDateKey(now);
+    const todayReadable = now.toLocaleDateString("en-IN", {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      year: "numeric"
+    });
+
+    todayDate.textContent = todayReadable;
+
+    let allTaskStates = load("dailyTaskStatesByDate", {});
+    let taskState = allTaskStates[todayKey] || Array(dailyTasks.length).fill(false);
+
+    function renderChecklist() {
+      checklistEl.innerHTML = "";
+      dailyTasks.forEach((task, index) => {
+        const label = document.createElement("label");
+        label.className = "task" + (taskState[index] ? " done" : "");
+        label.innerHTML = `<input type="checkbox" ${taskState[index] ? "checked" : ""}><span>${task}</span>`;
+        const input = label.querySelector("input");
+        input.addEventListener("change", () => {
+          taskState[index] = input.checked;
+          allTaskStates[todayKey] = taskState;
+          save("dailyTaskStatesByDate", allTaskStates);
+          save("dailyTaskState", taskState);
+          renderChecklist();
+          updateProgress();
+        });
+        checklistEl.appendChild(label);
+      });
+      updateProgress();
+    }
+
+    function getDateKey(date) {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
+      return `${year}-${month}-${day}`;
+    }
+
+    function getMonthKey(date) {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      return `${year}-${month}`;
+    }
+
+    function saveTodayProgress(percent) {
+      const progressHistory = load("dailyProgressHistory", {});
+      progressHistory[todayKey] = percent;
+      save("dailyProgressHistory", progressHistory);
+    }
+
+    function updateProgress() {
+      const completed = taskState.filter(Boolean).length;
+      const percent = Math.round((completed / dailyTasks.length) * 100);
+      progressFill.style.width = percent + "%";
+      progressText.textContent = `${percent}% • ${completed}/${dailyTasks.length}`;
+      heroProgress.textContent = percent + "%";
+      saveTodayProgress(percent);
+      renderMonthChart();
+    }
+
+    function renderMonthChart() {
+      const progressHistory = load("dailyProgressHistory", {});
+      const year = now.getFullYear();
+      const month = now.getMonth();
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      const currentMonthKey = getMonthKey(now);
+      const monthValues = [];
+
+      monthChart.innerHTML = "";
+
+      for (let day = 1; day <= daysInMonth; day++) {
+        const date = new Date(year, month, day);
+        const key = getDateKey(date);
+        const value = progressHistory[key] || 0;
+        monthValues.push(value);
+
+        const wrap = document.createElement("div");
+        wrap.className = "chart-bar-wrap";
+        wrap.title = `${key}: ${value}%`;
+
+        const bar = document.createElement("div");
+        bar.className = "chart-bar" + (value === 0 ? " empty" : "") + (key === todayKey ? " today" : "");
+        bar.style.height = Math.max(value, 3) + "%";
+
+        const label = document.createElement("div");
+        label.className = "chart-day";
+        label.textContent = day;
+
+        wrap.appendChild(bar);
+        wrap.appendChild(label);
+        monthChart.appendChild(wrap);
+      }
+
+      const savedValues = monthValues.filter(value => value > 0);
+      const todayPercent = progressHistory[todayKey] || 0;
+      const best = savedValues.length ? Math.max(...savedValues) : 0;
+      const average = savedValues.length
+        ? Math.round(savedValues.reduce((sum, value) => sum + value, 0) / savedValues.length)
+        : 0;
+
+      chartToday.textContent = todayPercent + "%";
+      chartBest.textContent = best + "%";
+      chartAverage.textContent = average + "%";
+    }
+
+    document.getElementById("resetToday").addEventListener("click", () => {
+      taskState = Array(dailyTasks.length).fill(false);
+      allTaskStates[todayKey] = taskState;
+      save("dailyTaskStatesByDate", allTaskStates);
+      save("dailyTaskState", taskState);
+      saveTodayProgress(0);
+      renderChecklist();
+    });
+
+    // =========================
+    // Roadmap + Projects
+    // =========================
+
+    function renderRoadmap() {
+      const list = document.getElementById("roadmapList");
+      list.innerHTML = roadmap.map((level, index) => `
+        <div class="level">
+          <div class="level-number">${index + 1}</div>
+          <div class="card">
+            <h3>Level ${index + 1}: ${level.title}</h3>
+            <div class="tag-list">${level.topics.map(topic => `<span class="tag">${topic}</span>`).join("")}</div>
+            <p><strong>Skill goal:</strong> ${level.goal}</p>
+            <p><strong>Project idea:</strong> ${level.project}</p>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function renderProjects() {
+      const grid = document.getElementById("projectGrid");
+      grid.innerHTML = projects.map((p, i) => `
+        <div class="card">
+          <div class="card-icon">${i + 1}</div>
+          <h3>${p[0]}</h3>
+          <p><strong>Tech:</strong> ${p[1]}</p>
+          <p><strong>Purpose:</strong> ${p[2]}</p>
+        </div>
+      `).join("");
+    }
+
+    // =========================
+    // Money Tracker
+    // =========================
+
+    const moneyFields = ["income", "expense", "investment", "moneyNotes"];
+
+    function loadMoney() {
+      const data = load("moneyData", {});
+      moneyFields.forEach(id => {
+        const el = document.getElementById(id);
+        el.value = data[id] || "";
+        el.addEventListener("input", updateMoney);
+      });
+      updateMoney();
+    }
+
+    function updateMoney() {
+      const income = Number(document.getElementById("income").value) || 0;
+      const expense = Number(document.getElementById("expense").value) || 0;
+      const savings = income - expense;
+      const percent = income > 0 ? Math.round((savings / income) * 100) : 0;
+
+      document.getElementById("savingsValue").textContent = `₹${savings.toLocaleString("en-IN")}`;
+      document.getElementById("savingsPercent").textContent = `${percent}%`;
+
+      const data = {};
+      moneyFields.forEach(id => data[id] = document.getElementById(id).value);
+      save("moneyData", data);
+    }
+
+    // =========================
+    // English Practice
+    // =========================
+
+    function setupEnglishPractice() {
+      const box = document.getElementById("englishPractice");
+      box.value = load("englishPractice", "");
+      box.addEventListener("input", () => save("englishPractice", box.value));
+    }
+
+    // =========================
+    // Weekly Review
+    // =========================
+
+    function renderReview() {
+      const grid = document.getElementById("reviewGrid");
+      const data = load("weeklyReview", {});
+      grid.innerHTML = "";
+
+      reviewQuestions.forEach((question, index) => {
+        const wrap = document.createElement("div");
+        wrap.className = "field card";
+        wrap.innerHTML = `<label>${question}</label><textarea id="review-${index}" placeholder="Write here..."></textarea>`;
+        const textarea = wrap.querySelector("textarea");
+        textarea.value = data[index] || "";
+        textarea.addEventListener("input", () => {
+          const current = load("weeklyReview", {});
+          current[index] = textarea.value;
+          save("weeklyReview", current);
+        });
+        grid.appendChild(wrap);
+      });
+    }
+
+    document.getElementById("clearReview").addEventListener("click", () => {
+      localStorage.removeItem("weeklyReview");
+      renderReview();
+    });
+
+    // =========================
+    // Search Prompt Cards
+    // =========================
+
+    function renderPrompts() {
+      const grid = document.getElementById("promptGrid");
+      grid.innerHTML = Object.entries(searchGroups).map(([group, prompts]) => `
+        <div class="card prompt-card">
+          <h3>${group}</h3>
+          ${prompts.map(prompt => `
+            <div class="copy-row">
+              <span>${prompt}</span>
+              <button class="copy-btn" data-copy="${prompt.replaceAll('"', '&quot;')}">Copy</button>
+            </div>
+          `).join("")}
+        </div>
+      `).join("");
+
+      document.querySelectorAll(".copy-btn").forEach(button => {
+        button.addEventListener("click", async () => {
+          const text = button.dataset.copy;
+          await navigator.clipboard.writeText(text);
+          const original = button.textContent;
+          button.textContent = "Done";
+          setTimeout(() => button.textContent = original, 900);
+        });
+      });
+    }
+
+    // =========================
+    // 6-Month Plan
+    // =========================
+
+    function renderMonthPlan() {
+      const wrap = document.getElementById("monthPlan");
+      wrap.innerHTML = months.map(([title, body]) => `
+        <div class="card">
+          <div class="card-icon">✦</div>
+          <h3>${title}</h3>
+          <p>${body}</p>
+        </div>
+      `).join("");
+    }
+
+    // =========================
+    // Init
+    // =========================
+
+    renderChecklist();
+    renderMonthChart();
+    renderRoadmap();
+    renderProjects();
+    loadMoney();
+    setupEnglishPractice();
+    renderReview();
+    renderPrompts();
+    renderMonthPlan();
+  </script>
+</body>
+</html>
