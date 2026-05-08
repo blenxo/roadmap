@@ -1017,6 +1017,156 @@
 
     .hidden-panel.show { display: block; }
 
+
+
+    .timeline::before {
+      top: 118px;
+      left: 23px;
+    }
+
+    .roadmap-total {
+      margin-left: 64px;
+    }
+
+    .level {
+      position: relative;
+    }
+
+    .level-number {
+      flex-shrink: 0;
+    }
+
+    .task-manager-list {
+      display: grid;
+      gap: 10px;
+      margin: 18px 0;
+    }
+
+    .task-editor-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: center;
+      padding: 10px;
+      border-radius: var(--radius-md);
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .task-editor-row input {
+      min-width: 0;
+    }
+
+    .danger-btn {
+      color: var(--danger);
+      border-color: rgba(255,107,138,0.25);
+      background: rgba(255,107,138,0.1);
+    }
+
+    .review-accordion {
+      display: grid;
+      gap: 12px;
+    }
+
+    .review-item {
+      padding: 0;
+      overflow: hidden;
+    }
+
+    .review-question-btn {
+      width: 100%;
+      border: 0;
+      cursor: pointer;
+      color: var(--text);
+      background: transparent;
+      text-align: left;
+      padding: 18px;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .review-question-btn span:last-child {
+      color: var(--cyan);
+      font-size: 1.2rem;
+    }
+
+    .review-answer-panel {
+      display: none;
+      padding: 0 18px 18px;
+    }
+
+    .review-item.open .review-answer-panel {
+      display: block;
+    }
+
+    .review-bottom-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: flex-end;
+      margin-top: 18px;
+    }
+
+    .review-history {
+      margin-top: 26px;
+    }
+
+    .review-history-list {
+      display: grid;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .week-row {
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(255,255,255,0.11);
+      background: rgba(255,255,255,0.06);
+      overflow: hidden;
+    }
+
+    .week-toggle {
+      width: 100%;
+      border: 0;
+      cursor: pointer;
+      color: var(--text);
+      background: transparent;
+      padding: 15px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      text-align: left;
+      font-weight: 800;
+    }
+
+    .week-details {
+      display: none;
+      padding: 0 16px 16px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .week-row.open .week-details {
+      display: block;
+    }
+
+    .week-answer {
+      padding: 12px;
+      border-radius: var(--radius-md);
+      background: rgba(0,0,0,0.16);
+      border: 1px solid rgba(255,255,255,0.08);
+      margin-top: 10px;
+    }
+
+    .week-answer strong {
+      display: block;
+      color: var(--text);
+      margin-bottom: 5px;
+    }
+
     @media (max-width: 980px) {
       .hero-grid,
       .grid,
@@ -1111,6 +1261,26 @@
       <div class="input-grid" style="margin-top: 14px;">
         <div class="field"><label>New user name</label><input id="newUserName" placeholder="Example: Loki"></div>
         <button class="btn btn-primary" id="createUserBtn" style="align-self:end;">Create User</button>
+      </div>
+    </div>
+  </div>
+
+
+
+  <div class="modal-backdrop" id="taskModal">
+    <div class="modal-card">
+      <div class="modal-head">
+        <div>
+          <div class="section-kicker">Daily Tasks</div>
+          <h2>Add, edit, or remove tasks</h2>
+        </div>
+        <button class="icon-btn" id="closeTaskModal">×</button>
+      </div>
+      <p class="section-desc">Edit task names one by one. Add new tasks without deleting your existing checklist.</p>
+      <div class="task-manager-list" id="taskManagerList"></div>
+      <div class="action-row">
+        <button class="btn" id="addTaskRowBtn">+ Add Task</button>
+        <button class="btn btn-primary" id="saveTasksBtn">Save Tasks</button>
       </div>
     </div>
   </div>
@@ -1299,12 +1469,19 @@
       <div class="container">
         <div class="section-header">
           <div><div class="section-kicker">Weekly Review</div><h2>Review your system, not your self-worth.</h2></div>
-          <div class="action-row" style="margin-top:0;">
-            <button class="btn btn-primary" id="saveReviewBtn">Save Weekly Review</button>
-            <button class="btn" id="clearReview">Clear Review</button>
-          </div>
+          <p class="section-desc">Questions stay hidden until you click them. Save each week to build a simple review history.</p>
         </div>
-        <div class="review-grid" id="reviewGrid"></div>
+        <div class="review-accordion" id="reviewGrid"></div>
+        <div class="review-bottom-actions">
+          <button class="btn" id="clearReview">Clear Current Review</button>
+          <button class="btn btn-primary" id="saveReviewBtn">Save Weekly Review</button>
+        </div>
+        <div class="card review-history">
+          <div class="section-kicker">Past Weekly Reviews</div>
+          <h3>Saved weeks</h3>
+          <p class="section-desc">Click a week to view what you saved. Details stay hidden until opened.</p>
+          <div class="review-history-list" id="reviewHistoryList"></div>
+        </div>
       </div>
     </section>
 
@@ -1628,20 +1805,105 @@
       showToast("Today’s checklist saved");
     });
 
-    document.getElementById("editTasksBtn").addEventListener("click", () => {
-      const text = prompt("Add or edit daily tasks. Put each task on a new line:", dailyTasks.join("\n"));
-      if (text === null) return;
-      const updated = text.split("\n").map(t => t.trim()).filter(Boolean);
-      if (!updated.length) {
+    let taskDrafts = [];
+
+    function openTaskManager() {
+      taskDrafts = dailyTasks.map(task => task);
+      renderTaskManager();
+      document.getElementById("taskModal").classList.add("show");
+    }
+
+    function closeTaskManager() {
+      taskDrafts = [];
+      document.getElementById("taskModal").classList.remove("show");
+    }
+
+    function renderTaskManager() {
+      const list = document.getElementById("taskManagerList");
+      list.innerHTML = "";
+      taskDrafts.forEach((task, index) => {
+        const row = document.createElement("div");
+        row.className = "task-editor-row";
+        row.innerHTML = `
+          <input type="text" value="${escapeHtml(task)}" data-task-input="${index}" placeholder="Task name">
+          <button class="btn danger-btn" data-remove-task="${index}">Remove</button>
+        `;
+        list.appendChild(row);
+      });
+
+      document.querySelectorAll("[data-task-input]").forEach(input => {
+        input.addEventListener("input", () => {
+          taskDrafts[Number(input.dataset.taskInput)] = input.value;
+        });
+      });
+
+      document.querySelectorAll("[data-remove-task]").forEach(button => {
+        button.addEventListener("click", () => {
+          const index = Number(button.dataset.removeTask);
+          if (taskDrafts.length <= 1) {
+            alert("Keep at least one task.");
+            return;
+          }
+          taskDrafts.splice(index, 1);
+          renderTaskManager();
+        });
+      });
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    document.getElementById("editTasksBtn").addEventListener("click", openTaskManager);
+
+    document.getElementById("closeTaskModal").addEventListener("click", closeTaskManager);
+    document.getElementById("taskModal").addEventListener("click", (event) => {
+      if (event.target.id === "taskModal") closeTaskManager();
+    });
+
+    document.getElementById("addTaskRowBtn").addEventListener("click", () => {
+      taskDrafts.push("New task");
+      renderTaskManager();
+      const inputs = document.querySelectorAll("[data-task-input]");
+      const lastInput = inputs[inputs.length - 1];
+      if (lastInput) {
+        lastInput.focus();
+        lastInput.select();
+      }
+    });
+
+    document.getElementById("saveTasksBtn").addEventListener("click", () => {
+      const oldTasks = [...dailyTasks];
+      const oldStateByTask = {};
+      oldTasks.forEach((task, index) => {
+        if (!(task in oldStateByTask)) oldStateByTask[task] = Boolean(taskState[index]);
+      });
+
+      const updatedTasks = taskDrafts.map(task => String(task).trim()).filter(Boolean);
+      if (!updatedTasks.length) {
         alert("Keep at least one task.");
         return;
       }
-      dailyTasks = updated;
-      taskState = dailyTasks.map((_, index) => Boolean(taskState[index]));
+
+      const nextState = updatedTasks.map((task, index) => {
+        if (oldTasks[index] === task) return Boolean(taskState[index]);
+        if (task in oldStateByTask) return Boolean(oldStateByTask[task]);
+        return false;
+      });
+
+      dailyTasks = updatedTasks;
+      taskState = nextState;
       save("customDailyTasks", dailyTasks);
       allTaskStates[todayKey] = taskState;
       save("dailyTaskStatesByDate", allTaskStates);
+      save("dailyTaskState", taskState);
       renderChecklist();
+      closeTaskManager();
       showToast("Tasks updated");
     });
 
@@ -1816,6 +2078,13 @@
     // Weekly Review
     // =========================
 
+    function getCurrentWeekLabel() {
+      const start = new Date(now.getFullYear(), 0, 1);
+      const days = Math.floor((now - start) / 86400000);
+      const weekNumber = Math.ceil((days + start.getDay() + 1) / 7);
+      return `Week ${weekNumber}`;
+    }
+
     function renderReview() {
       const grid = document.getElementById("reviewGrid");
       const data = load("weeklyReview", {});
@@ -1823,8 +2092,16 @@
 
       reviewQuestions.forEach((question, index) => {
         const wrap = document.createElement("div");
-        wrap.className = "field card";
-        wrap.innerHTML = `<label>${question}</label><textarea id="review-${index}" placeholder="Write here..."></textarea>`;
+        wrap.className = "card review-item";
+        wrap.innerHTML = `
+          <button class="review-question-btn" data-review-toggle="${index}">
+            <span>${question}</span>
+            <span>+</span>
+          </button>
+          <div class="review-answer-panel">
+            <textarea id="review-${index}" placeholder="Write here..."></textarea>
+          </div>
+        `;
         const textarea = wrap.querySelector("textarea");
         textarea.value = data[index] || "";
         textarea.addEventListener("input", () => {
@@ -1834,16 +2111,84 @@
         });
         grid.appendChild(wrap);
       });
+
+      document.querySelectorAll("[data-review-toggle]").forEach(button => {
+        button.addEventListener("click", () => {
+          const item = button.closest(".review-item");
+          item.classList.toggle("open");
+          button.querySelector("span:last-child").textContent = item.classList.contains("open") ? "−" : "+";
+        });
+      });
+
+      renderReviewHistory();
+    }
+
+    function collectReviewAnswers() {
+      const answers = {};
+      reviewQuestions.forEach((_, index) => {
+        const textarea = document.getElementById(`review-${index}`);
+        answers[index] = textarea ? textarea.value.trim() : "";
+      });
+      return answers;
+    }
+
+    function renderReviewHistory() {
+      const list = document.getElementById("reviewHistoryList");
+      if (!list) return;
+      const history = load("weeklyReviewHistory", []);
+      if (!history.length) {
+        list.innerHTML = `<div class="week-row"><button class="week-toggle" type="button"><span>No saved weekly reviews yet</span><span>—</span></button></div>`;
+        return;
+      }
+
+      list.innerHTML = history.map((entry, index) => `
+        <div class="week-row">
+          <button class="week-toggle" type="button" data-week-toggle="${index}">
+            <span>${entry.label || `Week ${index + 1}`} • ${entry.date || "Saved"}</span>
+            <span>View</span>
+          </button>
+          <div class="week-details">
+            ${reviewQuestions.map((question, qIndex) => {
+              const answer = entry.answers?.[qIndex] || "Not written";
+              return `<div class="week-answer"><strong>${question}</strong><p>${escapeHtml(answer).replaceAll("\n", "<br>")}</p></div>`;
+            }).join("")}
+          </div>
+        </div>
+      `).join("");
+
+      document.querySelectorAll("[data-week-toggle]").forEach(button => {
+        button.addEventListener("click", () => {
+          const row = button.closest(".week-row");
+          row.classList.toggle("open");
+          button.querySelector("span:last-child").textContent = row.classList.contains("open") ? "Hide" : "View";
+        });
+      });
     }
 
     document.getElementById("saveReviewBtn").addEventListener("click", () => {
-      showToast("Weekly review saved");
+      const answers = collectReviewAnswers();
+      const hasAnyAnswer = Object.values(answers).some(value => value.trim());
+      if (!hasAnyAnswer) {
+        alert("Write at least one answer before saving the weekly review.");
+        return;
+      }
+      const history = load("weeklyReviewHistory", []);
+      history.push({
+        label: `Week ${history.length + 1}`,
+        calendarWeek: getCurrentWeekLabel(),
+        date: new Date().toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }),
+        answers
+      });
+      save("weeklyReviewHistory", history);
+      save("weeklyReview", answers);
+      renderReviewHistory();
+      showToast("Weekly review saved to history");
     });
 
     document.getElementById("clearReview").addEventListener("click", () => {
       localStorage.removeItem("weeklyReview");
       renderReview();
-      showToast("Weekly review cleared");
+      showToast("Current review cleared");
     });
 
     // =========================
