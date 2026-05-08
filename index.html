@@ -835,6 +835,188 @@
       50% { transform: translateY(-12px); }
     }
 
+
+    .user-login-btn {
+      white-space: nowrap;
+      background: rgba(94,231,255,0.12);
+      border-color: rgba(94,231,255,0.28);
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      display: none;
+      place-items: center;
+      padding: 18px;
+      background: rgba(0,0,0,0.58);
+      backdrop-filter: blur(14px);
+      z-index: 999;
+    }
+
+    .modal-backdrop.show { display: grid; }
+
+    .modal-card {
+      width: min(620px, 100%);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      background: linear-gradient(145deg, rgba(13,19,42,0.96), rgba(6,9,20,0.96));
+      box-shadow: var(--shadow);
+      padding: 24px;
+    }
+
+    .modal-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 14px;
+      margin-bottom: 10px;
+    }
+
+    .icon-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.08);
+      color: var(--text);
+      cursor: pointer;
+      font-size: 1.4rem;
+    }
+
+    .current-user-box {
+      margin: 14px 0;
+      padding: 14px;
+      border-radius: var(--radius-md);
+      background: rgba(94,231,255,0.09);
+      border: 1px solid rgba(94,231,255,0.16);
+      color: var(--muted);
+    }
+
+    .user-list {
+      display: grid;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .user-chip {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      padding: 11px 12px;
+      border-radius: var(--radius-md);
+      background: rgba(255,255,255,0.065);
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .action-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .toast {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(12px);
+      padding: 12px 16px;
+      border-radius: 999px;
+      background: rgba(124,255,178,0.16);
+      border: 1px solid rgba(124,255,178,0.32);
+      color: var(--green);
+      transition: 0.25s ease;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .cartoon-chart-card {
+      background:
+        radial-gradient(circle at 12% 18%, rgba(255,226,124,0.19), transparent 19%),
+        radial-gradient(circle at 88% 12%, rgba(255,94,207,0.18), transparent 18%),
+        linear-gradient(145deg, rgba(255,255,255,0.14), rgba(255,255,255,0.06));
+    }
+
+    .cartoon-chart-card h2::after {
+      content: " ✨";
+    }
+
+    .cartoon-chart-card .month-chart {
+      border: 2px dashed rgba(255,255,255,0.22);
+      background:
+        radial-gradient(circle, rgba(255,255,255,0.08) 2px, transparent 2px),
+        rgba(0,0,0,0.13);
+      background-size: 24px 24px;
+      border-radius: 34px;
+      box-shadow: inset 0 0 0 4px rgba(255,255,255,0.035);
+    }
+
+    .cartoon-chart-card .chart-bar {
+      border-radius: 18px 18px 10px 10px;
+      border: 2px solid rgba(255,255,255,0.28);
+      position: relative;
+    }
+
+    .cartoon-chart-card .chart-bar::before {
+      content: "";
+      position: absolute;
+      inset: 6px 5px auto 5px;
+      height: 8px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.38);
+    }
+
+    .roadmap-total {
+      margin-bottom: 18px;
+      padding: 18px;
+      border-radius: var(--radius-xl);
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.11);
+    }
+
+    .topic-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 12px 0;
+    }
+
+    .topic-btn {
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 999px;
+      padding: 8px 11px;
+      background: rgba(255,255,255,0.07);
+      color: var(--muted);
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    .topic-btn.done {
+      color: #04101e;
+      background: linear-gradient(135deg, var(--green), var(--cyan));
+      font-weight: 800;
+    }
+
+    .level-complete-btn {
+      margin-top: 10px;
+      background: rgba(124,255,178,0.11);
+      border-color: rgba(124,255,178,0.25);
+    }
+
+    .hidden-panel {
+      display: none;
+      margin-top: 16px;
+    }
+
+    .hidden-panel.show { display: block; }
+
     @media (max-width: 980px) {
       .hero-grid,
       .grid,
@@ -907,11 +1089,33 @@
     <div class="nav-links">
       <a href="#today">Today</a>
       <a href="#roadmap">Roadmap</a>
-      <a href="#projects">Projects</a>
       <a href="#money">Money</a>
       <a href="#review">Review</a>
+      <a href="#profile">About</a>
     </div>
+    <button class="btn user-login-btn" id="userLoginBtn">👤 Login / User</button>
   </nav>
+
+  <div class="modal-backdrop" id="userModal">
+    <div class="modal-card">
+      <div class="modal-head">
+        <div>
+          <div class="section-kicker">User System</div>
+          <h2>Select or create user</h2>
+        </div>
+        <button class="icon-btn" id="closeUserModal">×</button>
+      </div>
+      <p class="section-desc">For now this user selector saves in the browser. Later we can connect the same logic to Supabase for phone + laptop sync.</p>
+      <div class="current-user-box">Current User: <strong id="currentUserName">No user selected</strong></div>
+      <div class="user-list" id="userList"></div>
+      <div class="input-grid" style="margin-top: 14px;">
+        <div class="field"><label>New user name</label><input id="newUserName" placeholder="Example: Loki"></div>
+        <button class="btn btn-primary" id="createUserBtn" style="align-self:end;">Create User</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast">Saved</div>
 
   <header class="hero" id="hero">
     <div class="container hero-grid">
@@ -951,27 +1155,6 @@
   </header>
 
   <main>
-    <section class="section" id="profile">
-      <div class="container">
-        <div class="section-header">
-          <div>
-            <div class="section-kicker">Current Situation</div>
-            <h2>Your starting point is not weak. It is raw material.</h2>
-          </div>
-          <p class="section-desc">This dashboard is built around your real situation: AI/ML student, hardware diploma background, big goals, and the need for a simple daily system.</p>
-        </div>
-
-        <div class="grid">
-          <div class="card"><div class="card-icon">🎓</div><h3>B.Tech CSE AI & ML</h3><p>College learning gives you structure. Your job is to convert it into projects, proof, and confidence.</p></div>
-          <div class="card"><div class="card-icon">🛠</div><h3>Hardware Diploma</h3><p>Your hardware background can become a rare advantage when mixed with AI, IoT, robotics, and automation.</p></div>
-          <div class="card"><div class="card-icon">🧠</div><h3>Interests</h3><p>AI, ML, robotics, automation, PC hardware, finance, smart farming, and side income ideas.</p></div>
-          <div class="card"><div class="card-icon">⚡</div><h3>Strengths</h3><p>Curiosity, practical thinking, value-for-money mindset, hardware + AI combination, and willingness to improve.</p></div>
-          <div class="card"><div class="card-icon">🌀</div><h3>Weaknesses</h3><p>Procrastination, distraction, laziness, confusion, overthinking, and inconsistent routine.</p></div>
-          <div class="card"><div class="card-icon">💎</div><h3>Main Goal</h3><p>Financial freedom through skills, discipline, income-building, and smart money management.</p></div>
-        </div>
-      </div>
-    </section>
-
     <section class="section" id="today">
       <div class="container grid-2">
         <div class="card" id="tracker">
@@ -987,13 +1170,17 @@
           </div>
 
           <div class="checklist" id="dailyChecklist"></div>
-          <button class="btn" style="margin-top: 16px;" id="resetToday">Reset Today</button>
+          <div class="action-row">
+            <button class="btn btn-primary" id="saveTodayBtn">Save Today’s Checklist</button>
+            <button class="btn" id="editTasksBtn">Add / Edit Task</button>
+            <button class="btn" id="resetToday">Reset Today</button>
+          </div>
         </div>
 
-        <div class="card chart-card">
+        <div class="card chart-card cartoon-chart-card">
           <div class="section-kicker">Monthly Progress Graph</div>
           <h2>This month’s execution.</h2>
-          <p class="section-desc">Every time you tick today’s tasks, the daily percentage is saved automatically for the current date.</p>
+          <p class="section-desc">A playful cartoon-style monthly graph. Save each day and watch your discipline streak grow.</p>
 
           <div class="chart-summary">
             <div class="mini-metric"><span>Today</span><strong id="chartToday">0%</strong></div>
@@ -1007,40 +1194,6 @@
       </div>
     </section>
 
-    <section class="section" id="emergency">
-      <div class="container">
-        <div class="card emergency">
-          <div class="section-kicker">Emergency Mode</div>
-          <h2>When I feel lazy</h2>
-          <ul>
-            <li>Drink water.</li>
-            <li>Clean table.</li>
-            <li>Start only 5 minutes.</li>
-            <li>Do one small task.</li>
-            <li>Mark tracker.</li>
-          </ul>
-          <div class="quote" style="margin-top: 20px;">Action first. Motivation comes after movement.</div>
-        </div>
-      </div>
-    </section>
-
-    <section class="section" id="routine">
-      <div class="container">
-        <div class="section-header">
-          <div><div class="section-kicker">Weekly Routine</div><h2>A simple rhythm for skill, college, and health.</h2></div>
-        </div>
-        <div class="routine-grid">
-          <div class="day-card"><strong>Monday</strong><span>Python + College subject + Walking</span></div>
-          <div class="day-card"><strong>Tuesday</strong><span>SQL + Data Structures + English practice</span></div>
-          <div class="day-card"><strong>Wednesday</strong><span>Machine Learning basics + Project work</span></div>
-          <div class="day-card"><strong>Thursday</strong><span>AI tools / automation + OS/DBMS revision</span></div>
-          <div class="day-card"><strong>Friday</strong><span>Hardware/IoT learning + GitHub update</span></div>
-          <div class="day-card"><strong>Saturday</strong><span>Portfolio project + Resume/LinkedIn improvement</span></div>
-          <div class="day-card"><strong>Sunday</strong><span>Weekly review + Rest + Planning next week</span></div>
-        </div>
-      </div>
-    </section>
-
     <section class="section" id="roadmap">
       <div class="container">
         <div class="section-header">
@@ -1049,15 +1202,6 @@
         </div>
 
         <div class="timeline" id="roadmapList"></div>
-      </div>
-    </section>
-
-    <section class="section" id="projects">
-      <div class="container">
-        <div class="section-header">
-          <div><div class="section-kicker">Portfolio Projects</div><h2>Projects that prove you can build.</h2></div>
-        </div>
-        <div class="grid" id="projectGrid"></div>
       </div>
     </section>
 
@@ -1080,15 +1224,19 @@
         <div class="card">
           <div class="section-kicker">Mini Financial Tracker</div>
           <h2>Monthly Money Dashboard</h2>
-          <div class="input-grid" style="margin-top: 16px;">
-            <div class="field"><label>Monthly income</label><input type="number" id="income" placeholder="₹0"></div>
-            <div class="field"><label>Monthly expense</label><input type="number" id="expense" placeholder="₹0"></div>
-            <div class="field"><label>Investment</label><input type="number" id="investment" placeholder="₹0"></div>
-            <div class="field"><label>Notes</label><input type="text" id="moneyNotes" placeholder="Example: avoid impulse buying"></div>
-          </div>
-          <div class="money-result">
-            <div class="metric"><span>Savings</span><strong id="savingsValue">₹0</strong></div>
-            <div class="metric"><span>Savings %</span><strong id="savingsPercent">0%</strong></div>
+          <p class="section-desc">Hidden by default so money details stay clean on the page.</p>
+          <button class="btn btn-primary" id="toggleMoneyTracker">Show Financial Tracker</button>
+          <div id="moneyTrackerBody" class="hidden-panel">
+            <div class="input-grid" style="margin-top: 16px;">
+              <div class="field"><label>Monthly income</label><input type="number" id="income" placeholder="₹0"></div>
+              <div class="field"><label>Monthly expense</label><input type="number" id="expense" placeholder="₹0"></div>
+              <div class="field"><label>Investment</label><input type="number" id="investment" placeholder="₹0"></div>
+              <div class="field"><label>Notes</label><input type="text" id="moneyNotes" placeholder="Example: avoid impulse buying"></div>
+            </div>
+            <div class="money-result">
+              <div class="metric"><span>Savings</span><strong id="savingsValue">₹0</strong></div>
+              <div class="metric"><span>Savings %</span><strong id="savingsPercent">0%</strong></div>
+            </div>
           </div>
         </div>
       </div>
@@ -1151,7 +1299,10 @@
       <div class="container">
         <div class="section-header">
           <div><div class="section-kicker">Weekly Review</div><h2>Review your system, not your self-worth.</h2></div>
-          <button class="btn" id="clearReview">Clear Review</button>
+          <div class="action-row" style="margin-top:0;">
+            <button class="btn btn-primary" id="saveReviewBtn">Save Weekly Review</button>
+            <button class="btn" id="clearReview">Clear Review</button>
+          </div>
         </div>
         <div class="review-grid" id="reviewGrid"></div>
       </div>
@@ -1174,6 +1325,29 @@
         <div class="month-plan" id="monthPlan"></div>
       </div>
     </section>
+    <section class="section" id="profile">
+      <div class="container">
+        <div class="section-header">
+          <div>
+            <div class="section-kicker">Current Situation / About Me</div>
+            <h2>Your starting point is not weak. It is raw material.</h2>
+          </div>
+          <p class="section-desc">This dashboard is built around your real situation: AI/ML student, hardware diploma background, big goals, and the need for a simple daily system.</p>
+        </div>
+
+        <div class="grid">
+          <div class="card"><div class="card-icon">🎓</div><h3>B.Tech CSE AI & ML</h3><p>College learning gives you structure. Your job is to convert it into projects, proof, and confidence.</p></div>
+          <div class="card"><div class="card-icon">🛠</div><h3>Hardware Diploma</h3><p>Your hardware background can become a rare advantage when mixed with AI, IoT, robotics, and automation.</p></div>
+          <div class="card"><div class="card-icon">🧠</div><h3>Interests</h3><p>AI, ML, robotics, automation, PC hardware, finance, smart farming, and side income ideas.</p></div>
+          <div class="card"><div class="card-icon">⚡</div><h3>Strengths</h3><p>Curiosity, practical thinking, value-for-money mindset, hardware + AI combination, and willingness to improve.</p></div>
+          <div class="card"><div class="card-icon">🌀</div><h3>Weaknesses</h3><p>Procrastination, distraction, laziness, confusion, overthinking, and inconsistent routine.</p></div>
+          <div class="card"><div class="card-icon">💎</div><h3>Main Goal</h3><p>Financial freedom through skills, discipline, income-building, and smart money management.</p></div>
+        </div>
+      </div>
+    </section>
+
+
+
   </main>
 
   <footer>
@@ -1188,7 +1362,7 @@
     // Data
     // =========================
 
-    const dailyTasks = [
+    let dailyTasks = [
       "Study college subject for 30 minutes",
       "Learn career skill for 30 minutes",
       "Practice coding / AI / project for 30 minutes",
@@ -1314,6 +1488,15 @@
       }
     }
 
+    dailyTasks = load("customDailyTasks", dailyTasks);
+
+    function showToast(message = "Saved") {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.classList.add("show");
+      setTimeout(() => toast.classList.remove("show"), 1400);
+    }
+
     // =========================
     // Daily Checklist
     // =========================
@@ -1341,6 +1524,7 @@
 
     let allTaskStates = load("dailyTaskStatesByDate", {});
     let taskState = allTaskStates[todayKey] || Array(dailyTasks.length).fill(false);
+    taskState = dailyTasks.map((_, index) => Boolean(taskState[index]));
 
     function renderChecklist() {
       checklistEl.innerHTML = "";
@@ -1436,6 +1620,31 @@
       chartAverage.textContent = average + "%";
     }
 
+    document.getElementById("saveTodayBtn").addEventListener("click", () => {
+      allTaskStates[todayKey] = taskState;
+      save("dailyTaskStatesByDate", allTaskStates);
+      save("dailyTaskState", taskState);
+      updateProgress();
+      showToast("Today’s checklist saved");
+    });
+
+    document.getElementById("editTasksBtn").addEventListener("click", () => {
+      const text = prompt("Add or edit daily tasks. Put each task on a new line:", dailyTasks.join("\n"));
+      if (text === null) return;
+      const updated = text.split("\n").map(t => t.trim()).filter(Boolean);
+      if (!updated.length) {
+        alert("Keep at least one task.");
+        return;
+      }
+      dailyTasks = updated;
+      taskState = dailyTasks.map((_, index) => Boolean(taskState[index]));
+      save("customDailyTasks", dailyTasks);
+      allTaskStates[todayKey] = taskState;
+      save("dailyTaskStatesByDate", allTaskStates);
+      renderChecklist();
+      showToast("Tasks updated");
+    });
+
     document.getElementById("resetToday").addEventListener("click", () => {
       taskState = Array(dailyTasks.length).fill(false);
       allTaskStates[todayKey] = taskState;
@@ -1443,25 +1652,96 @@
       save("dailyTaskState", taskState);
       saveTodayProgress(0);
       renderChecklist();
+      showToast("Today reset");
     });
 
     // =========================
     // Roadmap + Projects
     // =========================
 
+    function getRoadmapProgress() {
+      return load("roadmapProgress", {});
+    }
+
+    function saveRoadmapProgress(progress) {
+      save("roadmapProgress", progress);
+    }
+
+    function calculateRoadmapStats() {
+      const progress = getRoadmapProgress();
+      let done = 0;
+      let total = 0;
+      roadmap.forEach((level, levelIndex) => {
+        level.topics.forEach((_, topicIndex) => {
+          total++;
+          if (progress[`${levelIndex}-${topicIndex}`]) done++;
+        });
+      });
+      return { done, total, percent: total ? Math.round((done / total) * 100) : 0 };
+    }
+
     function renderRoadmap() {
       const list = document.getElementById("roadmapList");
-      list.innerHTML = roadmap.map((level, index) => `
-        <div class="level">
-          <div class="level-number">${index + 1}</div>
-          <div class="card">
-            <h3>Level ${index + 1}: ${level.title}</h3>
-            <div class="tag-list">${level.topics.map(topic => `<span class="tag">${topic}</span>`).join("")}</div>
-            <p><strong>Skill goal:</strong> ${level.goal}</p>
-            <p><strong>Project idea:</strong> ${level.project}</p>
-          </div>
+      const progress = getRoadmapProgress();
+      const stats = calculateRoadmapStats();
+
+      list.innerHTML = `
+        <div class="roadmap-total">
+          <div class="progress-label"><span>Whole AI/ML Roadmap Progress</span><strong>${stats.percent}% • ${stats.done}/${stats.total}</strong></div>
+          <div class="progress-bg"><div class="progress-fill" style="width:${stats.percent}%"></div></div>
         </div>
-      `).join("");
+      `;
+
+      list.innerHTML += roadmap.map((level, levelIndex) => {
+        const completedTopics = level.topics.filter((_, topicIndex) => progress[`${levelIndex}-${topicIndex}`]).length;
+        const levelPercent = Math.round((completedTopics / level.topics.length) * 100);
+        return `
+          <div class="level">
+            <div class="level-number">${levelIndex + 1}</div>
+            <div class="card">
+              <h3>Level ${levelIndex + 1}: ${level.title}</h3>
+              <div class="progress-wrap">
+                <div class="progress-label"><span>Level Progress</span><strong>${levelPercent}% • ${completedTopics}/${level.topics.length}</strong></div>
+                <div class="progress-bg"><div class="progress-fill" style="width:${levelPercent}%"></div></div>
+              </div>
+              <div class="topic-grid">
+                ${level.topics.map((topic, topicIndex) => {
+                  const key = `${levelIndex}-${topicIndex}`;
+                  return `<button class="topic-btn ${progress[key] ? "done" : ""}" data-level="${levelIndex}" data-topic="${topicIndex}">${progress[key] ? "✓" : "+"} ${topic}</button>`;
+                }).join("")}
+              </div>
+              <p><strong>Skill goal:</strong> ${level.goal}</p>
+              <p><strong>Project idea:</strong> ${level.project}</p>
+              <button class="btn level-complete-btn" data-complete-level="${levelIndex}">Mark Level ${levelIndex + 1} Complete</button>
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      document.querySelectorAll(".topic-btn").forEach(button => {
+        button.addEventListener("click", () => {
+          const level = button.dataset.level;
+          const topic = button.dataset.topic;
+          const progress = getRoadmapProgress();
+          const key = `${level}-${topic}`;
+          progress[key] = !progress[key];
+          saveRoadmapProgress(progress);
+          renderRoadmap();
+        });
+      });
+
+      document.querySelectorAll("[data-complete-level]").forEach(button => {
+        button.addEventListener("click", () => {
+          const levelIndex = Number(button.dataset.completeLevel);
+          const progress = getRoadmapProgress();
+          roadmap[levelIndex].topics.forEach((_, topicIndex) => {
+            progress[`${levelIndex}-${topicIndex}`] = true;
+          });
+          saveRoadmapProgress(progress);
+          renderRoadmap();
+          showToast(`Level ${levelIndex + 1} completed`);
+        });
+      });
     }
 
     function renderProjects() {
@@ -1506,6 +1786,22 @@
       save("moneyData", data);
     }
 
+    function setupMoneyToggle() {
+      const btn = document.getElementById("toggleMoneyTracker");
+      const body = document.getElementById("moneyTrackerBody");
+      const isOpen = load("moneyTrackerOpen", false);
+      if (isOpen) {
+        body.classList.add("show");
+        btn.textContent = "Hide Financial Tracker";
+      }
+      btn.addEventListener("click", () => {
+        body.classList.toggle("show");
+        const open = body.classList.contains("show");
+        btn.textContent = open ? "Hide Financial Tracker" : "Show Financial Tracker";
+        save("moneyTrackerOpen", open);
+      });
+    }
+
     // =========================
     // English Practice
     // =========================
@@ -1540,9 +1836,14 @@
       });
     }
 
+    document.getElementById("saveReviewBtn").addEventListener("click", () => {
+      showToast("Weekly review saved");
+    });
+
     document.getElementById("clearReview").addEventListener("click", () => {
       localStorage.removeItem("weeklyReview");
       renderReview();
+      showToast("Weekly review cleared");
     });
 
     // =========================
@@ -1589,15 +1890,103 @@
       `).join("");
     }
 
+
+    // =========================
+    // Simple User Selector
+    // =========================
+
+    function getUsers() {
+      return load("lifeOSUsers", []);
+    }
+
+    function getCurrentUser() {
+      return load("lifeOSCurrentUser", null);
+    }
+
+    function setCurrentUser(user) {
+      save("lifeOSCurrentUser", user);
+      updateCurrentUserUI();
+    }
+
+    function updateCurrentUserUI() {
+      const user = getCurrentUser();
+      const name = user ? user.name : "No user selected";
+      document.getElementById("currentUserName").textContent = name;
+      document.getElementById("userLoginBtn").textContent = user ? `👤 ${user.name}` : "👤 Login / User";
+    }
+
+    function renderUserList() {
+      const list = document.getElementById("userList");
+      const users = getUsers();
+      if (!users.length) {
+        list.innerHTML = `<div class="user-chip"><span>No users yet. Create one below.</span></div>`;
+        return;
+      }
+      list.innerHTML = users.map(user => `
+        <div class="user-chip">
+          <span>👤 ${user.name}</span>
+          <button class="btn" data-select-user="${user.id}">Select</button>
+        </div>
+      `).join("");
+
+      document.querySelectorAll("[data-select-user]").forEach(button => {
+        button.addEventListener("click", () => {
+          const user = getUsers().find(u => u.id === button.dataset.selectUser);
+          if (user) {
+            setCurrentUser(user);
+            document.getElementById("userModal").classList.remove("show");
+            showToast(`Switched to ${user.name}`);
+          }
+        });
+      });
+    }
+
+    function setupUserSystem() {
+      const modal = document.getElementById("userModal");
+      document.getElementById("userLoginBtn").addEventListener("click", () => {
+        renderUserList();
+        modal.classList.add("show");
+      });
+      document.getElementById("closeUserModal").addEventListener("click", () => modal.classList.remove("show"));
+      modal.addEventListener("click", (event) => {
+        if (event.target === modal) modal.classList.remove("show");
+      });
+
+      document.getElementById("createUserBtn").addEventListener("click", () => {
+        const input = document.getElementById("newUserName");
+        const name = input.value.trim();
+        if (!name) {
+          alert("Enter a user name first.");
+          return;
+        }
+        const users = getUsers();
+        if (users.some(u => u.name.toLowerCase() === name.toLowerCase())) {
+          alert("This user already exists. Select it from the list.");
+          return;
+        }
+        const user = { id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()), name };
+        users.push(user);
+        save("lifeOSUsers", users);
+        setCurrentUser(user);
+        input.value = "";
+        renderUserList();
+        modal.classList.remove("show");
+        showToast(`Created ${name}`);
+      });
+
+      updateCurrentUserUI();
+    }
+
     // =========================
     // Init
     // =========================
 
+    setupUserSystem();
     renderChecklist();
     renderMonthChart();
     renderRoadmap();
-    renderProjects();
     loadMoney();
+    setupMoneyToggle();
     setupEnglishPractice();
     renderReview();
     renderPrompts();
